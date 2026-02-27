@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@pitchdrop/shared": "workspace:*",
     "@privy-io/react-auth": "^3.14.1",
     "@privy-io/wagmi": "^4.0.2",
     "@repo/ui": "workspace:*",
