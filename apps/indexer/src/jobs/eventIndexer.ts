@@ -17,6 +17,10 @@ const VOTE_CAST = parseAbiItem(
   'event VoteCast(uint256 indexed ideaId, address indexed voter, bool direction, uint256 weight, uint8 tier)',
 )
 
+const IDEA_RESOLVED = parseAbiItem(
+  'event IdeaResolved(uint256 indexed ideaId, bool won, uint32 pmfScore)',
+)
+
 const VOTING_WINDOW_MS = 69 * 60 * 60 * 1000
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
@@ -72,15 +76,16 @@ export async function startEventIndexer(): Promise<void> {
         ? fromBlock + BATCH_SIZE - 1n
         : latestBlock
 
-      // Fetch both event types in parallel
-      const [ideaLogs, voteLogs] = await Promise.all([
+      // Fetch all three event types in parallel
+      const [ideaLogs, voteLogs, resolvedLogs] = await Promise.all([
         client.getLogs({ address: registryAddr, event: IDEA_REGISTERED, fromBlock, toBlock }),
         client.getLogs({ address: engineAddr,   event: VOTE_CAST,       fromBlock, toBlock }),
+        client.getLogs({ address: registryAddr, event: IDEA_RESOLVED,   fromBlock, toBlock }),
       ])
 
-      if (ideaLogs.length > 0 || voteLogs.length > 0) {
+      if (ideaLogs.length > 0 || voteLogs.length > 0 || resolvedLogs.length > 0) {
         console.log(
-          `[indexer] blocks ${fromBlock}–${toBlock}: ${ideaLogs.length} IdeaRegistered, ${voteLogs.length} VoteCast`,
+          `[indexer] blocks ${fromBlock}–${toBlock}: ${ideaLogs.length} IdeaRegistered, ${voteLogs.length} VoteCast, ${resolvedLogs.length} IdeaResolved`,
         )
       }
 
@@ -103,6 +108,16 @@ export async function startEventIndexer(): Promise<void> {
             direction: log.args.direction!,
             weight:    log.args.weight!,
             tier:      log.args.tier!,
+          })
+        }
+      }
+
+      for (const log of resolvedLogs) {
+        if (log.args.ideaId !== undefined) {
+          await handleIdeaResolved({
+            ideaId:   log.args.ideaId,
+            won:      log.args.won!,
+            pmfScore: log.args.pmfScore!,
           })
         }
       }
@@ -164,6 +179,26 @@ async function handleIdeaRegistered(args: {
     console.log(`[indexer] IdeaRegistered  onchainId=${onchainId} founder=${founder}`)
   } catch (err) {
     console.error(`[indexer] handleIdeaRegistered error (onchainId=${onchainId}):`, err)
+  }
+}
+
+async function handleIdeaResolved(args: {
+  ideaId:   bigint
+  won:      boolean
+  pmfScore: number
+}): Promise<void> {
+  const { ideaId, won, pmfScore } = args
+  const onchainId = ideaId.toString()
+  const status    = won ? 'won' : 'graveyard'
+
+  try {
+    await db.idea.update({
+      where: { onchainId },
+      data:  { status, pmfScore },
+    })
+    console.log(`[indexer] IdeaResolved  onchainId=${onchainId} won=${won} pmfScore=${pmfScore}`)
+  } catch (err) {
+    console.error(`[indexer] handleIdeaResolved error (onchainId=${onchainId}):`, err)
   }
 }
 

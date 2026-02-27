@@ -4,6 +4,7 @@ import cors from '@fastify/cors'
 import { ideasRoutes } from './routes/ideas'
 import { votesRoutes } from './routes/votes'
 import { startEventIndexer } from './jobs/eventIndexer'
+import { startResolutionEngine } from './jobs/resolutionEngine'
 
 const app = Fastify({ logger: true })
 
@@ -22,6 +23,9 @@ const start = async () => {
     // No-ops gracefully if contract addresses are not set.
     startEventIndexer().catch((err) => {
       app.log.error({ err }, '[indexer] eventIndexer crashed')
+    })
+    startResolutionEngine().catch((err) => {
+      app.log.error({ err }, '[resolver] resolutionEngine crashed')
     })
   } catch (err) {
     app.log.error(err)
