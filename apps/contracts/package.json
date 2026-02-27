@@ -1,0 +1,10 @@
+{
+  "name": "@pitchdrop/contracts",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "lint": "solhint 'src/**/*.sol'"
+  }
+}

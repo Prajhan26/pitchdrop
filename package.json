@@ -1,11 +1,12 @@
 {
-  "name": "my-turborepo",
+  "name": "pitchdrop",
   "private": true,
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,sol,md}\"",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
@@ -13,7 +14,7 @@
     "turbo": "^2.7.1",
     "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.30.3",
   "engines": {
     "node": ">=18"
   }

@@ -1,0 +1,23 @@
+{
+  "name": "@pitchdrop/shared",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint src/",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@pitchdrop/typescript-config": "workspace:*",
+    "@pitchdrop/eslint-config": "workspace:*",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "zod": "^3.23.0",
+    "viem": "^2.21.0"
+  }
+}

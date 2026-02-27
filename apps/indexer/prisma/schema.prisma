@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Tables added per-story as needed per epics.md
+// Story 2.1: Ideas table
+model Idea {
+  id          String   @id @default(cuid())
+  onchainId   String   @unique
+  title       String
+  description String
+  category    String
+  isAnonymous Boolean  @default(false)
+  founderAddr String?
+  status      String   @default("pending") // pending | active | won | graveyard
+  publishedAt DateTime?
+  closesAt    DateTime?
+  yesWeight   Float    @default(0)
+  noWeight    Float    @default(0)
+  pmfScore    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  votes       Vote[]
+}
+
+// Story 2.4: Votes table
+model Vote {
+  id         String   @id @default(cuid())
+  ideaId     String
+  voterAddr  String
+  direction  String   // yes | no
+  weight     Float
+  tier       Int?     // 1 | 2 | 3
+  castedAt   DateTime @default(now())
+  idea       Idea     @relation(fields: [ideaId], references: [id])
+
+  @@unique([ideaId, voterAddr])
+  @@index([ideaId])
+  @@index([voterAddr])
+}
+
+// Story 7.1: Reputation table
+model Reputation {
+  id             String   @id @default(cuid())
+  walletAddr     String   @unique
+  score          Float    @default(1.0)
+  totalVotes     Int      @default(0)
+  correctCalls   Int      @default(0)
+  streakDays     Int      @default(0)
+  lastVotedAt    DateTime?
+  updatedAt      DateTime @updatedAt
+}
