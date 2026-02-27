@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { useAirdropEligibility } from '../hooks/useAirdrop'
+import { useAirdropClaim, useHasClaimed, useMerkleRootSet } from '../hooks/useAirdropClaim'
 import { AuthButton } from '../components/AuthButton'
 import type { AirdropIdeaAllocation } from '../lib/api'
 
@@ -35,7 +36,136 @@ function TierBadge({ tier }: { tier: number }) {
   )
 }
 
-function IdeaCard({ idea }: { idea: AirdropIdeaAllocation }) {
+// IdeaClaimRow calls hooks at component level (rules of hooks) and renders the claim button.
+type IdeaClaimRowProps = {
+  idea:          AirdropIdeaAllocation
+  walletAddress: string | undefined
+  tokenAddr:     string
+}
+
+function IdeaClaimRow({ idea, walletAddress, tokenAddr }: IdeaClaimRowProps) {
+  const onchainId = idea.onchainId ?? ''
+
+  const { data: hasClaimed } = useHasClaimed(onchainId, walletAddress)
+  const rootIsSet            = useMerkleRootSet(onchainId)
+  const airdropClaim         = useAirdropClaim()
+
+  if (!idea.eligible) {
+    return (
+      <button
+        disabled
+        style={{
+          padding:       '8px 16px',
+          borderRadius:  '8px',
+          border:        '1px solid #1e1e1e',
+          background:    '#1a1a1a',
+          color:         '#475569',
+          cursor:        'not-allowed',
+          fontSize:      '13px',
+          fontWeight:    500,
+        }}
+      >
+        Not eligible
+      </button>
+    )
+  }
+
+  if (!onchainId) {
+    return (
+      <button
+        disabled
+        style={{
+          padding:       '8px 16px',
+          borderRadius:  '8px',
+          border:        '1px solid #1e1e1e',
+          background:    '#1a1a1a',
+          color:         '#475569',
+          cursor:        'not-allowed',
+          fontSize:      '13px',
+          fontWeight:    500,
+        }}
+      >
+        Merkle proof pending
+      </button>
+    )
+  }
+
+  if (hasClaimed) {
+    return (
+      <span style={{
+        padding:       '8px 16px',
+        borderRadius:  '8px',
+        border:        '1px solid rgba(16,185,129,0.3)',
+        background:    'rgba(16,185,129,0.08)',
+        color:         '#10b981',
+        fontSize:      '13px',
+        fontWeight:    600,
+        display:       'inline-block',
+      }}>
+        Claimed
+      </span>
+    )
+  }
+
+  if (!rootIsSet) {
+    return (
+      <button
+        disabled
+        title="Merkle proof pending"
+        style={{
+          padding:       '8px 16px',
+          borderRadius:  '8px',
+          border:        '1px solid #1e1e1e',
+          background:    '#1a1a1a',
+          color:         '#475569',
+          cursor:        'not-allowed',
+          fontSize:      '13px',
+          fontWeight:    500,
+        }}
+      >
+        Merkle proof pending
+      </button>
+    )
+  }
+
+  // Root is set and not yet claimed — show active Claim button
+  return (
+    <button
+      disabled={airdropClaim.isPending || !airdropClaim.isAvailable}
+      onClick={() =>
+        airdropClaim.claim(
+          onchainId,
+          tokenAddr,
+          BigInt(idea.allocation) * BigInt(1e18),
+          [],
+        )
+      }
+      style={{
+        padding:       '8px 16px',
+        borderRadius:  '8px',
+        border:        'none',
+        background:    airdropClaim.isPending ? '#1e1e1e' : '#6366f1',
+        color:         airdropClaim.isPending ? '#475569' : '#fff',
+        cursor:        airdropClaim.isPending ? 'not-allowed' : 'pointer',
+        fontSize:      '13px',
+        fontWeight:    600,
+      }}
+    >
+      {airdropClaim.isPending ? 'Claiming…' : 'Claim'}
+    </button>
+  )
+}
+
+function IdeaCard({
+  idea,
+  walletAddress,
+}: {
+  idea:          AirdropIdeaAllocation
+  walletAddress: string | undefined
+}) {
+  // tokenAddr placeholder — will be populated when real token addresses are available
+  const tokenAddr = '0x0000000000000000000000000000000000000000'
+
   return (
     <div style={{
       background:   '#111',
@@ -92,24 +222,13 @@ function IdeaCard({ idea }: { idea: AirdropIdeaAllocation }) {
         </p>
       )}
 
-      {/* Claim button */}
+      {/* Claim button — on-chain aware */}
       <div style={{ position: 'relative', display: 'inline-block' }}>
-        <button
-          disabled
-          title="Merkle proof pending"
-          style={{
-            padding:       '8px 16px',
-            borderRadius:  '8px',
-            border:        '1px solid #1e1e1e',
-            background:    '#1a1a1a',
-            color:         '#475569',
-            cursor:        'not-allowed',
-            fontSize:      '13px',
-            fontWeight:    500,
-          }}
-        >
-          Claim — Merkle proof pending
-        </button>
+        <IdeaClaimRow
+          idea={idea}
+          walletAddress={walletAddress}
+          tokenAddr={tokenAddr}
+        />
       </div>
     </div>
   )
@@ -246,7 +365,11 @@ export default function AirdropPage() {
                     gap:                 '16px',
                   }}>
                     {data.ideas.map(idea => (
-                      <IdeaCard key={idea.ideaId} idea={idea} />
+                      <IdeaCard
+                        key={idea.ideaId}
+                        idea={idea}
+                        walletAddress={walletAddress}
+                      />
                     ))}
                   </div>
                 )}
