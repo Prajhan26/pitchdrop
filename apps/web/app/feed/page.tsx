@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useIdeas } from '../hooks/useIdeas'
+import { useAuth } from '../hooks/useAuth'
 import { IdeaCard } from '../components/IdeaCard'
 import { AuthButton } from '../components/AuthButton'
 import { SubmitIdeaModal } from '../components/SubmitIdeaModal'
@@ -13,6 +14,7 @@ export default function FeedPage() {
   const [filter, setFilter]     = useState<StatusFilter>('active')
   const [showModal, setShowModal] = useState(false)
   const { data, isLoading, isError, error } = useIdeas(filter)
+  const { isAuthenticated, walletAddress } = useAuth()
 
   return (
     <div style={pageStyle}>
@@ -38,6 +40,11 @@ export default function FeedPage() {
         <button onClick={() => setShowModal(true)} style={pitchButtonStyle}>
           + Drop a Pitch
         </button>
+        {isAuthenticated && walletAddress && (
+          <Link href={`/scout/${walletAddress}`} style={profileLinkStyle}>
+            My Profile
+          </Link>
+        )}
         <AuthButton />
       </header>
 
@@ -180,6 +187,13 @@ const gridStyle: React.CSSProperties = {
   display:       'flex',
   flexDirection: 'column',
   gap:           '16px',
+}
+
+const profileLinkStyle: React.CSSProperties = {
+  fontSize:       '13px',
+  color:          '#888',
+  textDecoration: 'none',
+  whiteSpace:     'nowrap',
 }
 
 const pitchButtonStyle: React.CSSProperties = {

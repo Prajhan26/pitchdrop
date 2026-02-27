@@ -29,6 +29,41 @@ export type ApiVote = {
   castedAt: string
 }
 
+export type ScoutStats = {
+  totalVotes:      number
+  correctCalls:    number
+  accuracy:        number
+  totalWeight:     number
+  streakDays:      number
+  tier1Votes:      number
+  tier2Votes:      number
+  tier3Votes:      number
+  reputationScore: number
+}
+
+export type ScoutVote = {
+  id:        string
+  direction: 'yes' | 'no'
+  weight:    number
+  tier:      number | null
+  castedAt:  string
+  idea: {
+    id:        string
+    title:     string
+    status:    string
+    pmfScore:  number | null
+    closesAt:  string | null
+    yesWeight: number
+    noWeight:  number
+  }
+}
+
+export type ScoutResponse = {
+  address: string
+  stats:   ScoutStats
+  votes:   ScoutVote[]
+}
+
 export type IdeasResponse = {
   ideas: ApiIdea[]
   total: number
@@ -78,4 +113,7 @@ export const api = {
 
   getVote: (ideaId: string, voterAddr: string) =>
     apiFetch<{ voted: boolean; vote?: ApiVote }>(`/votes/${ideaId}/${voterAddr}`),
+
+  getScout: (address: string) =>
+    apiFetch<ScoutResponse>(`/scouts/${address}`),
 }

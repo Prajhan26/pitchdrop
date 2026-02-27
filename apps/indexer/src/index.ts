@@ -3,6 +3,7 @@ import websocket from '@fastify/websocket'
 import cors from '@fastify/cors'
 import { ideasRoutes } from './routes/ideas'
 import { votesRoutes } from './routes/votes'
+import { scoutsRoutes } from './routes/scouts'
 import { startEventIndexer } from './jobs/eventIndexer'
 import { startResolutionEngine } from './jobs/resolutionEngine'
 
@@ -15,6 +16,7 @@ app.get('/health', async () => ({ status: 'ok', service: 'pitchdrop-indexer' }))
 
 app.register(ideasRoutes)
 app.register(votesRoutes)
+app.register(scoutsRoutes)
 
 const start = async () => {
   try {
