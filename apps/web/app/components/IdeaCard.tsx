@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { formatCountdown, getPhaseInfo, useCastVote, useVoterRecord, type ApiIdea } from '../hooks/useIdeas'
 import { useAuth } from '../hooks/useAuth'
+import { useCastVoteOnChain, ENGINE_ADDRESS } from '../hooks/useContracts'
 
 interface IdeaCardProps {
   idea: ApiIdea
@@ -10,7 +11,8 @@ interface IdeaCardProps {
 
 export function IdeaCard({ idea }: IdeaCardProps) {
   const { isAuthenticated, walletAddress, login } = useAuth()
-  const { mutate: castVote, isPending, isError, error } = useCastVote()
+  const { mutate: castVoteOffchain, isPending: isApiPending, isError, error } = useCastVote()
+  const { castVote: castVoteOnchain, isPending: isChainPending }              = useCastVoteOnChain()
 
   const { data: voteData } = useVoterRecord(
     idea.id,
@@ -32,13 +34,30 @@ export function IdeaCard({ idea }: IdeaCardProps) {
   const totalWeight = idea.yesWeight + idea.noWeight
   const yesPercent  = totalWeight > 0 ? Math.round((idea.yesWeight / totalWeight) * 100) : 50
   const noPercent   = 100 - yesPercent
+  const isPending   = isApiPending || isChainPending
+  const isClosed    = idea.status !== 'active'
 
-  const isClosed = idea.status !== 'active'
+  // Use on-chain voting when ENGINE_ADDRESS is set and idea has a confirmed onchainId
+  const canVoteOnChain =
+    !!ENGINE_ADDRESS &&
+    !!idea.onchainId &&
+    !idea.onchainId.startsWith('pending')
 
-  function handleVote(direction: 'yes' | 'no') {
+  async function handleVote(direction: 'yes' | 'no') {
     if (!isAuthenticated) { login(); return }
     if (!walletAddress)   return
-    castVote({ ideaId: idea.id, voterAddr: walletAddress, direction })
+    if (canVoteOnChain) {
+      // On-chain path: submit tx → record txHash in indexer
+      try {
+        const txHash = await castVoteOnchain(idea.onchainId, direction)
+        castVoteOffchain({ ideaId: idea.id, voterAddr: walletAddress, direction, txHash })
+      } catch {
+        // wallet rejection or revert — error displayed via isError
+      }
+    } else {
+      // Off-chain path: indexer only (pre-deployment or pending onchainId)
+      castVoteOffchain({ ideaId: idea.id, voterAddr: walletAddress, direction })
+    }
   }
 
   return (

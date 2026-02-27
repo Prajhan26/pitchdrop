@@ -61,6 +61,7 @@ export const api = {
     category: string
     isAnonymous: boolean
     founderAddr?: string
+    onchainId?: string
   }) =>
     apiFetch<{ idea: ApiIdea }>('/ideas', { method: 'POST', body: JSON.stringify(body) }),
 
@@ -68,6 +69,7 @@ export const api = {
     ideaId: string
     voterAddr: string
     direction: 'yes' | 'no'
+    txHash?: `0x${string}`
   }) =>
     apiFetch<{ vote: ApiVote; tier: number; weight: number }>('/votes', {
       method: 'POST',

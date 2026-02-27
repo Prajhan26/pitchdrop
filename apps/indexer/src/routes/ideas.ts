@@ -55,13 +55,15 @@ export async function ideasRoutes(app: FastifyInstance) {
     }
 
     const founderAddr = typeof body.founderAddr === 'string' ? body.founderAddr : null
+    // onchainId supplied when the contract tx has already been confirmed client-side
+    const onchainId   = typeof body.onchainId === 'string' ? body.onchainId : `pending-${Date.now()}`
 
     const publishedAt = new Date()
     const closesAt    = new Date(publishedAt.getTime() + VOTING_WINDOW_MS)
 
     const idea = await db.idea.create({
       data: {
-        onchainId:   `pending-${Date.now()}`,  // replaced after on-chain tx
+        onchainId,
         title:       parsed.data.title,
         description: parsed.data.description,
         category:    parsed.data.category,

@@ -4,12 +4,14 @@ import { useState } from 'react'
 import { useIdeas } from '../hooks/useIdeas'
 import { IdeaCard } from '../components/IdeaCard'
 import { AuthButton } from '../components/AuthButton'
+import { SubmitIdeaModal } from '../components/SubmitIdeaModal'
 import Link from 'next/link'
 
 type StatusFilter = 'active' | 'won' | 'graveyard' | 'all'
 
 export default function FeedPage() {
-  const [filter, setFilter] = useState<StatusFilter>('active')
+  const [filter, setFilter]     = useState<StatusFilter>('active')
+  const [showModal, setShowModal] = useState(false)
   const { data, isLoading, isError, error } = useIdeas(filter)
 
   return (
@@ -33,8 +35,13 @@ export default function FeedPage() {
             </button>
           ))}
         </nav>
+        <button onClick={() => setShowModal(true)} style={pitchButtonStyle}>
+          + Drop a Pitch
+        </button>
         <AuthButton />
       </header>
+
+      {showModal && <SubmitIdeaModal onClose={() => setShowModal(false)} />}
 
       {/* Main */}
       <main style={mainStyle}>
@@ -56,6 +63,9 @@ export default function FeedPage() {
           <div style={emptyStyle}>
             <p style={emptyTitleStyle}>No ideas yet</p>
             <p style={mutedStyle}>Be the first to drop a pitch.</p>
+            <button onClick={() => setShowModal(true)} style={{ ...pitchButtonStyle, marginTop: '16px' }}>
+              + Drop a Pitch
+            </button>
           </div>
         )}
 
@@ -170,4 +180,16 @@ const gridStyle: React.CSSProperties = {
   display:       'flex',
   flexDirection: 'column',
   gap:           '16px',
+}
+
+const pitchButtonStyle: React.CSSProperties = {
+  background:   '#6366f1',
+  color:        '#fff',
+  border:       'none',
+  borderRadius: '8px',
+  padding:      '8px 16px',
+  fontSize:     '13px',
+  fontWeight:   600,
+  cursor:       'pointer',
+  whiteSpace:   'nowrap',
 }
