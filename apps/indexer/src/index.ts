@@ -5,8 +5,11 @@ import { ideasRoutes } from './routes/ideas'
 import { votesRoutes } from './routes/votes'
 import { scoutsRoutes } from './routes/scouts'
 import { airdropRoutes } from './routes/airdrop'
+import { milestonesRoutes } from './routes/milestones'
 import { startEventIndexer } from './jobs/eventIndexer'
 import { startResolutionEngine } from './jobs/resolutionEngine'
+import { startReputationMinter } from './jobs/reputationMinter'
+import { startMerkleGenerator } from './jobs/merkleGenerator'
 
 const app = Fastify({ logger: true })
 
@@ -19,6 +22,7 @@ app.register(ideasRoutes)
 app.register(votesRoutes)
 app.register(scoutsRoutes)
 app.register(airdropRoutes)
+app.register(milestonesRoutes)
 
 const start = async () => {
   try {
@@ -30,6 +34,12 @@ const start = async () => {
     })
     startResolutionEngine().catch((err) => {
       app.log.error({ err }, '[resolver] resolutionEngine crashed')
+    })
+    startReputationMinter().catch((err) => {
+      app.log.error({ err }, '[reputationMinter] crashed')
+    })
+    startMerkleGenerator().catch((err) => {
+      app.log.error({ err }, '[merkleGenerator] crashed')
     })
   } catch (err) {
     app.log.error(err)

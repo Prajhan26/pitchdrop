@@ -122,6 +122,12 @@ export const api = {
 
   getAirdropEligibility: (walletAddr: string) =>
     apiFetch<AirdropResponse>(`/airdrop/${walletAddr}`),
+
+  submitMilestone: (body: MilestoneSubmission) =>
+    apiFetch<MilestoneResponse>('/milestones', { method: 'POST', body: JSON.stringify(body) }),
+
+  getMilestones: (ideaId: string) =>
+    apiFetch<{ ideaId: string; milestones: unknown[] }>(`/milestones/${ideaId}`),
 }
 
 export type AirdropIdeaAllocation = {
@@ -155,4 +161,18 @@ export type LeaderboardEntry = {
 
 export type LeaderboardResponse = {
   leaderboard: LeaderboardEntry[]
+}
+
+export type MilestoneSubmission = {
+  ideaId:      string
+  milestoneId: number
+  evidence:    string
+  submitter:   string
+}
+
+export type MilestoneResponse = {
+  status:      string
+  ideaId:      string
+  milestoneId: number
+  message:     string
 }
