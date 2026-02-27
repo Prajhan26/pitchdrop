@@ -44,6 +44,13 @@ model Vote {
   @@index([voterAddr])
 }
 
+// Story 1.7: Indexer cursor — single-row table tracking last processed block
+model IndexerState {
+  id        String   @id @default("singleton")
+  lastBlock BigInt   @default(0)
+  updatedAt DateTime @updatedAt
+}
+
 // Story 7.1: Reputation table
 model Reputation {
   id             String   @id @default(cuid())
