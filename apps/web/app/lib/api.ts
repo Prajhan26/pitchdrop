@@ -116,4 +116,43 @@ export const api = {
 
   getScout: (address: string) =>
     apiFetch<ScoutResponse>(`/scouts/${address}`),
+
+  getLeaderboard: () =>
+    apiFetch<LeaderboardResponse>('/scouts/leaderboard'),
+
+  getAirdropEligibility: (walletAddr: string) =>
+    apiFetch<AirdropResponse>(`/airdrop/${walletAddr}`),
+}
+
+export type AirdropIdeaAllocation = {
+  ideaId:         string
+  onchainId:      string | null
+  title:          string
+  pmfScore:       number | null
+  yesWeight:      number
+  eligible:       boolean
+  tier:           number | null
+  userWeight:     number
+  allocation:     number
+  claimed:        boolean
+  proofAvailable: boolean
+}
+
+export type AirdropResponse = {
+  walletAddr:      string
+  totalAllocation: number
+  ideas:           AirdropIdeaAllocation[]
+}
+
+export type LeaderboardEntry = {
+  rank:         number
+  walletAddr:   string
+  score:        number
+  totalVotes:   number
+  correctCalls: number
+  streakDays:   number
+}
+
+export type LeaderboardResponse = {
+  leaderboard: LeaderboardEntry[]
 }

@@ -45,6 +45,7 @@ export default function FeedPage() {
             My Profile
           </Link>
         )}
+        <Link href="/leaderboard" style={leaderboardLinkStyle}>🏆 Leaderboard</Link>
         <AuthButton />
       </header>
 
@@ -194,6 +195,13 @@ const profileLinkStyle: React.CSSProperties = {
   color:          '#888',
   textDecoration: 'none',
   whiteSpace:     'nowrap',
+}
+
+const leaderboardLinkStyle: React.CSSProperties = {
+  fontSize:    '13px',
+  color:       '#888',
+  textDecoration: 'none',
+  whiteSpace:  'nowrap',
 }
 
 const pitchButtonStyle: React.CSSProperties = {

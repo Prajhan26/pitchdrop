@@ -89,6 +89,25 @@ export async function scoutsRoutes(app: FastifyInstance) {
       })),
     }
   })
+
+  // GET /scouts/leaderboard — top 50 scouts by reputation score
+  app.get('/scouts/leaderboard', async (_req, reply) => {
+    const rows = await db.reputation.findMany({
+      orderBy: { score: 'desc' },
+      take:    50,
+    })
+
+    const leaderboard = rows.map((r, i) => ({
+      rank:         i + 1,
+      walletAddr:   r.walletAddr,
+      score:        r.score,
+      totalVotes:   r.totalVotes,
+      correctCalls: r.correctCalls,
+      streakDays:   r.streakDays,
+    }))
+
+    return reply.send({ leaderboard })
+  })
 }
 
 // ─── Streak computation ───────────────────────────────────────────────────────
