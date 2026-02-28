@@ -6,7 +6,7 @@
     "dev": "prisma generate && prisma db push && node dist/index.js",
     "seed": "tsx src/seed.ts",
     "build": "prisma generate && tsc",
-    "start": "prisma generate && prisma db push && node dist/index.js",
+    "start": "prisma generate && prisma db push && tsx src/index.ts",
     "test": "vitest run",
     "lint": "eslint src/"
   },
