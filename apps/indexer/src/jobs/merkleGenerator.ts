@@ -5,6 +5,8 @@ import {
   keccak256,
   encodePacked,
   type Address,
+  type PublicClient,
+  type WalletClient,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { base, baseSepolia } from 'viem/chains'
@@ -79,8 +81,8 @@ export async function startMerkleGenerator(): Promise<void> {
     : (process.env.BASE_SEPOLIA_RPC_URL ?? 'https://sepolia.base.org')
 
   const account      = privateKeyToAccount(rawKey as `0x${string}`)
-  const publicClient = createPublicClient({ chain, transport: http(rpcUrl) })
-  const walletClient = createWalletClient({ account, chain, transport: http(rpcUrl) })
+  const publicClient = createPublicClient({ chain, transport: http(rpcUrl) }) as unknown as PublicClient
+  const walletClient = createWalletClient({ account, chain, transport: http(rpcUrl) }) as unknown as WalletClient
 
   console.log(
     `[merkleGenerator] Started | owner=${account.address} | distributor=${distributorAddr} | chain=${chain.name}`,
@@ -122,8 +124,8 @@ export async function startMerkleGenerator(): Promise<void> {
 async function generateRoot(opts: {
   idea:            IdeaWithVotes
   distributorAddr: Address
-  publicClient:    ReturnType<typeof createPublicClient>
-  walletClient:    ReturnType<typeof createWalletClient>
+  publicClient:    PublicClient
+  walletClient:    WalletClient
 }): Promise<void> {
   const { idea, distributorAddr, publicClient, walletClient } = opts
 
@@ -153,12 +155,13 @@ async function generateRoot(opts: {
 
   // Check if the root is already set on-chain
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const existingRoot = await publicClient.readContract({
       address:      distributorAddr,
       abi:          AIRDROP_DISTRIBUTOR_ABI,
       functionName: 'merkleRoots',
       args:         [onchainId],
-    })
+    } as any) as `0x${string}`
 
     const ZERO_ROOT = '0x0000000000000000000000000000000000000000000000000000000000000000'
     if (existingRoot !== ZERO_ROOT) {

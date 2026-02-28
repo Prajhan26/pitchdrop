@@ -3,6 +3,8 @@ import {
   createWalletClient,
   http,
   type Address,
+  type PublicClient,
+  type WalletClient,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { base, baseSepolia } from 'viem/chains'
@@ -26,13 +28,13 @@ export async function startResolutionEngine(): Promise<void> {
     : (process.env.BASE_SEPOLIA_RPC_URL ?? 'https://sepolia.base.org')
 
   // Build optional on-chain clients
-  let publicClient:  ReturnType<typeof createPublicClient>  | undefined
-  let walletClient:  ReturnType<typeof createWalletClient>  | undefined
+  let publicClient:  PublicClient | undefined
+  let walletClient:  WalletClient | undefined
 
   if (registryAddr && rawKey) {
     const account = privateKeyToAccount(rawKey as `0x${string}`)
-    publicClient  = createPublicClient({ chain, transport: http(rpcUrl) })
-    walletClient  = createWalletClient({ account, chain, transport: http(rpcUrl) })
+    publicClient  = createPublicClient({ chain, transport: http(rpcUrl) }) as unknown as PublicClient
+    walletClient  = createWalletClient({ account, chain, transport: http(rpcUrl) }) as unknown as WalletClient
     console.log(
       `[resolver] Started | resolver=${account.address} | registry=${registryAddr} | chain=${chain.name}`,
     )
@@ -73,8 +75,8 @@ export async function startResolutionEngine(): Promise<void> {
 async function resolveOne(opts: {
   idea:         Awaited<ReturnType<typeof db.idea.findMany>>[number]
   registryAddr: Address | undefined
-  publicClient: ReturnType<typeof createPublicClient> | undefined
-  walletClient: ReturnType<typeof createWalletClient> | undefined
+  publicClient: PublicClient | undefined
+  walletClient: WalletClient | undefined
 }): Promise<void> {
   const { idea, registryAddr, publicClient, walletClient } = opts
 

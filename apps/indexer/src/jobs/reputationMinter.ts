@@ -3,6 +3,8 @@ import {
   createWalletClient,
   http,
   type Address,
+  type PublicClient,
+  type WalletClient,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { base, baseSepolia } from 'viem/chains'
@@ -43,8 +45,8 @@ export async function startReputationMinter(): Promise<void> {
     : (process.env.BASE_SEPOLIA_RPC_URL ?? 'https://sepolia.base.org')
 
   const account      = privateKeyToAccount(rawKey as `0x${string}`)
-  const publicClient = createPublicClient({ chain, transport: http(rpcUrl) })
-  const walletClient = createWalletClient({ account, chain, transport: http(rpcUrl) })
+  const publicClient = createPublicClient({ chain, transport: http(rpcUrl) }) as unknown as PublicClient
+  const walletClient = createWalletClient({ account, chain, transport: http(rpcUrl) }) as unknown as WalletClient
 
   console.log(
     `[reputationMinter] Started | minter=${account.address} | registry=${registryAddr} | chain=${chain.name}`,
@@ -79,8 +81,8 @@ export async function startReputationMinter(): Promise<void> {
 async function mintOrUpdate(opts: {
   row:           Awaited<ReturnType<typeof db.reputation.findMany>>[number]
   registryAddr:  Address
-  publicClient:  ReturnType<typeof createPublicClient>
-  walletClient:  ReturnType<typeof createWalletClient>
+  publicClient:  PublicClient
+  walletClient:  WalletClient
 }): Promise<void> {
   const { row, registryAddr, publicClient, walletClient } = opts
 
@@ -94,12 +96,13 @@ async function mintOrUpdate(opts: {
 
   try {
     // Check whether a token already exists for this wallet
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const tokenId = await publicClient.readContract({
       address:      registryAddr,
       abi:          REPUTATION_REGISTRY_ABI,
       functionName: 'tokenOfWallet',
       args:         [wallet],
-    })
+    } as any) as bigint
 
     const alreadyMinted = tokenId !== 0n
 
