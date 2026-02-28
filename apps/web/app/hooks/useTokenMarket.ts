@@ -2,6 +2,7 @@
 
 import { useReadContract, useWriteContract, usePublicClient } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
+import { useState, useEffect } from 'react'
 
 // Minimal ABI — only what the UI needs
 const BONDING_CURVE_ABI = [
@@ -18,6 +19,49 @@ const BONDING_CURVE_ABI = [
   { type: 'error', name: 'SlippageExceeded', inputs: [] },
   { type: 'error', name: 'ZeroValue', inputs: [] },
 ] as const
+
+export type BuyEvent = {
+  buyer:       `0x${string}`
+  ethIn:       bigint
+  tokensOut:   bigint
+  totalRaised: bigint
+  blockNumber: bigint
+  txHash:      `0x${string}`
+}
+
+export function useBuyHistory(curveAddress: `0x${string}` | undefined) {
+  const publicClient = usePublicClient()
+  const [events, setEvents]     = useState<BuyEvent[]>([])
+  const [loading, setLoading]   = useState(false)
+
+  useEffect(() => {
+    if (!curveAddress || !publicClient) return
+    setLoading(true)
+    publicClient.getLogs({
+      address:   curveAddress,
+      event:     { type: 'event', name: 'Bought', inputs: [
+        { name: 'buyer',         type: 'address', indexed: true  },
+        { name: 'ethIn',         type: 'uint256', indexed: false },
+        { name: 'tokensOut',     type: 'uint256', indexed: false },
+        { name: 'newTotalRaised',type: 'uint256', indexed: false },
+      ]},
+      fromBlock: 0n,
+      toBlock:   'latest',
+    }).then((logs) => {
+      const parsed: BuyEvent[] = logs.map((l) => ({
+        buyer:       l.args.buyer as `0x${string}`,
+        ethIn:       l.args.ethIn as bigint,
+        tokensOut:   l.args.tokensOut as bigint,
+        totalRaised: l.args.newTotalRaised as bigint,
+        blockNumber: l.blockNumber ?? 0n,
+        txHash:      l.transactionHash as `0x${string}`,
+      })).reverse()
+      setEvents(parsed)
+    }).catch(() => {}).finally(() => setLoading(false))
+  }, [curveAddress, publicClient])
+
+  return { events, loading }
+}
 
 export function useBondingCurve(curveAddress: `0x${string}` | undefined) {
   const { data: totalRaised }       = useReadContract({ address: curveAddress, abi: BONDING_CURVE_ABI, functionName: 'totalRaised',        query: { enabled: !!curveAddress, refetchInterval: 10_000 } })
