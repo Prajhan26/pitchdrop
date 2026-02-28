@@ -98,6 +98,14 @@ export default function IdeaDetailPage() {
                 >
                   {statusBadgeText(idea.status)}
                 </span>
+                {idea.curveAddr && (
+                  <Link
+                    href={`/token/${idea.onchainId}?curve=${idea.curveAddr}`}
+                    style={tradeBadgeStyle}
+                  >
+                    Trade CONV
+                  </Link>
+                )}
               </div>
 
               <h1 style={heroTitleStyle}>{idea.title}</h1>
@@ -382,6 +390,17 @@ const statusBadgeStyle: React.CSSProperties = {
   borderRadius: '4px',
   padding: '3px 10px',
   letterSpacing: '0.03em',
+}
+
+const tradeBadgeStyle: React.CSSProperties = {
+  fontSize:       '12px',
+  fontWeight:     600,
+  color:          '#6366f1',
+  textDecoration: 'none',
+  borderRadius:   '4px',
+  padding:        '3px 10px',
+  border:         '1px solid rgba(99,102,241,0.4)',
+  background:     'rgba(99,102,241,0.1)',
 }
 
 const heroTitleStyle: React.CSSProperties = {

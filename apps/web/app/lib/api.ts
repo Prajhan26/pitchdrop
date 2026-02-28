@@ -14,6 +14,8 @@ export type ApiIdea = {
   yesWeight: number
   noWeight: number
   pmfScore: number | null
+  curveAddr: string | null
+  tokenAddr: string | null
   createdAt: string
   updatedAt: string
   votes?: ApiVote[]
@@ -140,8 +142,10 @@ export type AirdropIdeaAllocation = {
   tier:           number | null
   userWeight:     number
   allocation:     number
+  tokenAddr:      string | null
   claimed:        boolean
   proofAvailable: boolean
+  proof:          string[]
 }
 
 export type AirdropResponse = {

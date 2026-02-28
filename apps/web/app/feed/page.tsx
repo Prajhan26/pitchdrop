@@ -79,7 +79,19 @@ export default function FeedPage() {
 
         <div style={gridStyle}>
           {data?.ideas.map((idea) => (
-            <IdeaCard key={idea.id} idea={idea} />
+            <div key={idea.id}>
+              <IdeaCard idea={idea} />
+              {idea.curveAddr && (
+                <div style={{ marginTop: '8px', textAlign: 'right' }}>
+                  <Link
+                    href={`/token/${idea.onchainId}?curve=${idea.curveAddr}`}
+                    style={tradeLinkStyle}
+                  >
+                    Trade CONV
+                  </Link>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </main>
@@ -202,6 +214,18 @@ const leaderboardLinkStyle: React.CSSProperties = {
   color:       '#888',
   textDecoration: 'none',
   whiteSpace:  'nowrap',
+}
+
+const tradeLinkStyle: React.CSSProperties = {
+  display:        'inline-block',
+  fontSize:       '12px',
+  fontWeight:     600,
+  color:          '#6366f1',
+  textDecoration: 'none',
+  padding:        '4px 12px',
+  borderRadius:   '6px',
+  border:         '1px solid rgba(99,102,241,0.3)',
+  background:     'rgba(99,102,241,0.08)',
 }
 
 const pitchButtonStyle: React.CSSProperties = {

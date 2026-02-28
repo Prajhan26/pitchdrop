@@ -137,7 +137,7 @@ function IdeaClaimRow({ idea, walletAddress, tokenAddr }: IdeaClaimRowProps) {
           onchainId,
           tokenAddr,
           BigInt(idea.allocation) * BigInt(1e18),
-          [],
+          (idea.proof ?? []) as `0x${string}`[],
         )
       }
       style={{
@@ -163,8 +163,7 @@ function IdeaCard({
   idea:          AirdropIdeaAllocation
   walletAddress: string | undefined
 }) {
-  // tokenAddr placeholder — will be populated when real token addresses are available
-  const tokenAddr = '0x0000000000000000000000000000000000000000'
+  const tokenAddr = idea.tokenAddr ?? '0x0000000000000000000000000000000000000000'
 
   return (
     <div style={{
