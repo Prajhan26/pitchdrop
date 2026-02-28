@@ -1,7 +1,7 @@
 [build]
 builder = "nixpacks"
-buildCommand = "pnpm install && pnpm build"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @pitchdrop/shared build && pnpm --filter @pitchdrop/indexer build"
 
 [deploy]
-startCommand = "pnpm start"
+startCommand = "pnpm --filter @pitchdrop/indexer start"
 restartPolicyType = "on_failure"
