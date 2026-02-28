@@ -46,6 +46,7 @@ export default function FeedPage() {
           </Link>
         )}
         <Link href="/leaderboard" style={leaderboardLinkStyle}>🏆 Leaderboard</Link>
+        <Link href="/agent" style={leaderboardLinkStyle}>⚡ Agent</Link>
         <AuthButton />
       </header>
 
