@@ -100,4 +100,4 @@ This is what ownerless coordination looks like in practice.
 https://github.com/Prajhan26/pitchdrop
 
 ## Demo
-[Vercel URL — adding shortly]
+https://pitchdrop-web.vercel.app/
