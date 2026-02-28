@@ -16,6 +16,7 @@ const app = Fastify({ logger: true })
 app.register(cors, { origin: process.env.CORS_ORIGIN || '*' })
 app.register(websocket)
 
+app.get('/', async () => ({ status: 'ok', service: 'pitchdrop-indexer' }))
 app.get('/health', async () => ({ status: 'ok', service: 'pitchdrop-indexer' }))
 
 app.register(ideasRoutes)
