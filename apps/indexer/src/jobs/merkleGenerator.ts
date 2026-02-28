@@ -2,11 +2,11 @@ import {
   createPublicClient,
   createWalletClient,
   http,
-  privateKeyToAccount,
   keccak256,
   encodePacked,
   type Address,
 } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import { base, baseSepolia } from 'viem/chains'
 import type { Idea, Vote } from '@prisma/client'
 import { db } from '../db'

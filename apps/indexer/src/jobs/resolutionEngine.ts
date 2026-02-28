@@ -2,9 +2,9 @@ import {
   createPublicClient,
   createWalletClient,
   http,
-  privateKeyToAccount,
   type Address,
 } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import { base, baseSepolia } from 'viem/chains'
 import { db } from '../db'
 import { IDEA_REGISTRY_ABI } from '@pitchdrop/shared'
