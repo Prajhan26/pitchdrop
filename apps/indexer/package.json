@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "prisma db push --skip-generate && tsx watch src/index.ts",
+    "dev": "prisma db push --skip-generate && tsx src/seed.ts && tsx watch src/index.ts",
+    "seed": "tsx src/seed.ts",
     "build": "prisma generate && tsc",
     "start": "node dist/index.js",
     "test": "vitest run",
