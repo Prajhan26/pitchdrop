@@ -21,6 +21,10 @@ const IDEA_RESOLVED = parseAbiItem(
   'event IdeaResolved(uint256 indexed ideaId, bool won, uint32 pmfScore)',
 )
 
+const CURVE_LAUNCHED = parseAbiItem(
+  'event CurveLaunched(uint256 indexed ideaId, address curve, address token)',
+)
+
 const VOTING_WINDOW_MS = 69 * 60 * 60 * 1000
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
@@ -28,6 +32,7 @@ const VOTING_WINDOW_MS = 69 * 60 * 60 * 1000
 export async function startEventIndexer(): Promise<void> {
   const registryAddr = process.env.IDEA_REGISTRY_ADDRESS as Address | undefined
   const engineAddr   = process.env.VOTING_ENGINE_ADDRESS as Address | undefined
+  const factoryAddr  = process.env.BONDING_CURVE_FACTORY_ADDRESS as Address | undefined
 
   if (!registryAddr || !engineAddr) {
     console.log(
@@ -76,16 +81,19 @@ export async function startEventIndexer(): Promise<void> {
         ? fromBlock + BATCH_SIZE - 1n
         : latestBlock
 
-      // Fetch all three event types in parallel
-      const [ideaLogs, voteLogs, resolvedLogs] = await Promise.all([
+      // Fetch all event types in parallel
+      const [ideaLogs, voteLogs, resolvedLogs, curveLogs] = await Promise.all([
         client.getLogs({ address: registryAddr, event: IDEA_REGISTERED, fromBlock, toBlock }),
         client.getLogs({ address: engineAddr,   event: VOTE_CAST,       fromBlock, toBlock }),
         client.getLogs({ address: registryAddr, event: IDEA_RESOLVED,   fromBlock, toBlock }),
+        factoryAddr
+          ? client.getLogs({ address: factoryAddr, event: CURVE_LAUNCHED, fromBlock, toBlock })
+          : Promise.resolve([]),
       ])
 
-      if (ideaLogs.length > 0 || voteLogs.length > 0 || resolvedLogs.length > 0) {
+      if (ideaLogs.length > 0 || voteLogs.length > 0 || resolvedLogs.length > 0 || curveLogs.length > 0) {
         console.log(
-          `[indexer] blocks ${fromBlock}–${toBlock}: ${ideaLogs.length} IdeaRegistered, ${voteLogs.length} VoteCast, ${resolvedLogs.length} IdeaResolved`,
+          `[indexer] blocks ${fromBlock}–${toBlock}: ${ideaLogs.length} IdeaRegistered, ${voteLogs.length} VoteCast, ${resolvedLogs.length} IdeaResolved, ${curveLogs.length} CurveLaunched`,
         )
       }
 
@@ -118,6 +126,16 @@ export async function startEventIndexer(): Promise<void> {
             ideaId:   log.args.ideaId,
             won:      log.args.won!,
             pmfScore: log.args.pmfScore!,
+          })
+        }
+      }
+
+      for (const log of curveLogs) {
+        if (log.args.ideaId !== undefined) {
+          await handleCurveLaunched({
+            ideaId: log.args.ideaId,
+            curve:  log.args.curve!,
+            token:  log.args.token!,
           })
         }
       }
@@ -199,6 +217,24 @@ async function handleIdeaResolved(args: {
     console.log(`[indexer] IdeaResolved  onchainId=${onchainId} won=${won} pmfScore=${pmfScore}`)
   } catch (err) {
     console.error(`[indexer] handleIdeaResolved error (onchainId=${onchainId}):`, err)
+  }
+}
+
+async function handleCurveLaunched(args: {
+  ideaId: bigint
+  curve:  string
+  token:  string
+}): Promise<void> {
+  const { ideaId, curve, token } = args
+  const onchainId = ideaId.toString()
+  try {
+    await db.idea.updateMany({
+      where: { onchainId },
+      data:  { curveAddr: curve.toLowerCase(), tokenAddr: token.toLowerCase() },
+    })
+    console.log(`[indexer] CurveLaunched  onchainId=${onchainId} curve=${curve} token=${token}`)
+  } catch (err) {
+    console.error(`[indexer] handleCurveLaunched error (onchainId=${onchainId}):`, err)
   }
 }
 

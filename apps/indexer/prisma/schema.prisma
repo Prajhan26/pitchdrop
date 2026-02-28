@@ -23,6 +23,8 @@ model Idea {
   yesWeight   Float    @default(0)
   noWeight    Float    @default(0)
   pmfScore    Int?
+  curveAddr   String?
+  tokenAddr   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   votes       Vote[]
