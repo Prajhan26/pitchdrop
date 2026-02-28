@@ -11,42 +11,42 @@ const MODULES = [
   {
     icon: '🧠',
     name: 'BullBear Evaluator',
-    status: 'active',
+    status: 'built',
     description:
-      'Every 60 seconds, fetches all active ideas and runs an AI sentiment model inside the TEE. ' +
-      'Generates a bull case, bear case, and conviction score — all computed inside hardware-isolated memory that nobody can access or modify.',
-    detail: 'Powered by Claude claude-sonnet-4-6 · runs every 60s',
+      'Fetches active ideas and generates a bull case, bear case, and PMF conviction score. ' +
+      'In production this calls Claude claude-sonnet-4-6 inside the EigenCloud TEE — hardware isolation means the ' +
+      'AI output cannot be tampered with. The PMF score you see on won idea cards comes from this module.',
+    detail: 'Code complete · Claude AI call wired · TEE deployment = production step',
   },
   {
     icon: '📋',
     name: 'Attestation Worker',
-    status: 'active',
+    status: 'built',
     description:
-      'For every idea that wins (69%+ votes), the agent hashes the full result — vote weights, ' +
-      'timestamp, PMF score — and posts it to EigenDA as a data availability blob. ' +
-      'The blob reference (eigenDaRef) is then written on-chain via SovereignAgent.postAttestation(). ' +
-      'Anyone can verify the decision without trusting the pitchdrop team.',
-    detail: 'keccak256 → EigenDA blob → on-chain ref · runs every 2m',
+      'For every idea that wins (69%+ votes), the agent computes a keccak256 hash of the full result ' +
+      '(vote weights, timestamp, PMF score) and stores it as the eigenDaRef. ' +
+      'In production this blob is submitted to EigenDA and then written on-chain via SovereignAgent.postAttestation(). ' +
+      'The SovereignAgent contract is live on Base Sepolia and ready to receive these.',
+    detail: 'Hash logic complete · SovereignAgent.sol deployed · EigenDA posting = production step',
   },
   {
     icon: '🏗️',
     name: 'Milestone Evaluator',
-    status: 'active',
+    status: 'built',
     description:
-      'Builders submit milestone evidence (links, screenshots, on-chain proofs). ' +
-      'The agent runs inside the TEE to evaluate whether the milestone was completed using Claude AI. ' +
-      'On approval, the BuildFund contract releases the tranche — no human admin required.',
-    detail: 'Claude AI evaluation + BuildFund release · runs every 5m',
+      'When a builder submits milestone evidence, the agent evaluates it using Claude AI inside the TEE. ' +
+      'On approval it calls BuildFund to release the tranche. No human admin can override this. ' +
+      'The BuildFund contract is deployed and the evaluation logic is implemented.',
+    detail: 'Evaluation logic complete · BuildFund.sol deployed · live trigger = production step',
   },
   {
     icon: '🛡️',
     name: 'OFAC Screener',
-    status: 'active',
+    status: 'live',
     description:
-      'Every wallet that interacts with pitchdrop is silently screened against OFAC sanctions lists ' +
-      'via TRM Labs. Blocked addresses are rejected at the API layer before any on-chain transaction. ' +
-      'This also runs inside the TEE so the screening logic cannot be bypassed.',
-    detail: 'TRM Labs API · screens on every vote + airdrop claim',
+      'Every wallet that votes or claims an airdrop is screened against OFAC sanctions lists via TRM Labs. ' +
+      'Blocked addresses are rejected at the API layer. This module is wired up and runs on the live indexer.',
+    detail: 'TRM Labs API · live on indexer · screens every vote + airdrop claim',
   },
 ]
 
@@ -103,10 +103,10 @@ export default function AgentPage() {
             </span>
             <span style={{
               padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 600,
-              background: 'rgba(16,185,129,0.1)', color: '#10b981',
-              border: '1px solid rgba(16,185,129,0.25)',
+              background: 'rgba(99,102,241,0.1)', color: '#818cf8',
+              border: '1px solid rgba(99,102,241,0.25)',
             }}>
-              ● Running
+              ◎ Contract live · TEE = prod
             </span>
           </div>
 
@@ -210,10 +210,11 @@ export default function AgentPage() {
                 <span style={{
                   marginLeft: 'auto', padding: '2px 8px', borderRadius: '999px',
                   fontSize: '11px', fontWeight: 600,
-                  background: 'rgba(16,185,129,0.1)', color: '#10b981',
-                  border: '1px solid rgba(16,185,129,0.2)',
+                  background: status === 'live' ? 'rgba(16,185,129,0.1)' : 'rgba(99,102,241,0.1)',
+                  color:      status === 'live' ? '#10b981' : '#818cf8',
+                  border:     `1px solid ${status === 'live' ? 'rgba(16,185,129,0.2)' : 'rgba(99,102,241,0.2)'}`,
                 }}>
-                  active
+                  {status === 'live' ? '● live' : '◎ built'}
                 </span>
               </div>
               <p style={{ margin: '0 0 8px', fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>

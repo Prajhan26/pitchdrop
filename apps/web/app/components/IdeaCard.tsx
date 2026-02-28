@@ -85,6 +85,25 @@ export function IdeaCard({ idea }: IdeaCardProps) {
       )}
       {idea.isAnonymous && <p style={founderStyle}>by anonymous</p>}
 
+      {/* PMF score badge for resolved ideas */}
+      {idea.pmfScore != null && (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '6px',
+          padding: '5px 12px', borderRadius: '8px', alignSelf: 'flex-start',
+          background: idea.pmfScore >= 70 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+          border: `1px solid ${idea.pmfScore >= 70 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+        }}>
+          <span style={{ fontSize: '11px', color: '#475569', fontWeight: 600 }}>⚡ EIGEN AGENT PMF</span>
+          <span style={{
+            fontSize: '14px', fontWeight: 800,
+            color: idea.pmfScore >= 70 ? '#10b981' : '#ef4444',
+          }}>
+            {idea.pmfScore}
+          </span>
+          <span style={{ fontSize: '11px', color: '#475569' }}>/100</span>
+        </div>
+      )}
+
       {/* Weight bar */}
       <div style={barContainerStyle}>
         <div style={{ ...yesBarStyle, width: `${yesPercent}%` }} />
