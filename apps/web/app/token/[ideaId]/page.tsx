@@ -247,9 +247,8 @@ export default function TokenMarketPage() {
             CONV Token · Pitch #{ideaId}
           </h1>
           <p style={{ margin: 0, fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>
-            Community approved. Token is live. Buy in at the bonding curve price —
-            price rises with every purchase. At 20 ETH the token migrates to
-            Aerodrome DEX, builder gets milestone funding, early voters receive vested airdrops.
+            Community approved this idea. Token is live — buy in now, price rises with every purchase.
+            Builder submits milestones to unlock funding. Early voters earn vested CONV airdrops.
           </p>
         </div>
 
@@ -344,7 +343,7 @@ export default function TokenMarketPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <StatCard label="ETH Raised" value={totalRaised ? `${fmt(totalRaised, 4)} ETH` : '—'} sub="of 20 ETH target" />
               <StatCard label="Buys" value={String(events.length)} sub="on-chain transactions" />
-              <StatCard label="Next milestone" value="DEX + Fund" sub="at 20 ETH raised" />
+              <StatCard label="Builder fund" value="Milestone" sub="agent verifies → releases" />
             </div>
           )}
         </div>
@@ -371,8 +370,8 @@ export default function TokenMarketPage() {
             }} />
           </div>
           <p style={{ margin: 0, fontSize: '12px', color: '#374151', lineHeight: 1.5 }}>
-            {totalRaised ? `${fmt(totalRaised, 4)} ETH` : '0 ETH'} raised of 20 ETH.
-            On graduation: liquidity → Aerodrome, 15% → builder milestone fund, early voters earn vested CONV airdrops.
+            {totalRaised ? `${fmt(totalRaised, 4)} ETH` : '0 ETH'} raised of 20 ETH target.
+            On graduation: token moves to Aerodrome DEX, early voters receive vested airdrops.
           </p>
         </div>
 
@@ -413,10 +412,10 @@ export default function TokenMarketPage() {
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {[
-              { icon: '💧', text: '85% of raised ETH → Aerodrome liquidity pool. Token trades on open DEX.' },
-              { icon: '🏗️', text: '15% → BuildFund treasury. Builder unlocks it milestone by milestone.' },
-              { icon: '🎁', text: 'Early voters (T1/T2/T3) receive vested CONV token airdrops based on when they voted.' },
-              { icon: '⚡', text: 'All milestone decisions verified by the EigenCloud Sovereign Agent — no human admin key.' },
+              { icon: '💧', text: '85% of raised ETH → Aerodrome liquidity pool. Token trades on open DEX from day 1.' },
+              { icon: '🏗️', text: 'Builder submits milestone proof → EigenCloud agent verifies → BuildFund releases the tranche.' },
+              { icon: '🎁', text: 'Early voters (T1/T2/T3) receive vested CONV airdrops. T1 = 3× multiplier, vests over 90 days.' },
+              { icon: '⚡', text: 'No admin key. The Sovereign Agent is the only authority on fund release.' },
             ].map(({ icon, text }) => (
               <div key={icon} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                 <span style={{ fontSize: '14px' }}>{icon}</span>

@@ -279,23 +279,41 @@ export default function AirdropPage() {
           CONV token allocations for early scouts who voted YES on winning ideas.
         </p>
 
+        {/* Tier explainer — always visible */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px', marginBottom: '32px' }}>
+          {[
+            { tier: 'T1', window: 'First 12h', mult: '3×', desc: 'Earliest believers — highest conviction reward', color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.25)' },
+            { tier: 'T2', window: '12–36h',    mult: '2×', desc: 'Early majority — strong signal', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.25)' },
+            { tier: 'T3', window: '36–69h',    mult: '1×', desc: 'Late voters — base allocation', color: '#f97316', bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.25)' },
+          ].map(({ tier, window, mult, desc, color, bg, border }) => (
+            <div key={tier} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color, fontFamily: 'monospace' }}>{tier}</span>
+                <span style={{ fontSize: '20px', fontWeight: 800, color }}>{mult}</span>
+              </div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color, marginBottom: '4px' }}>{window}</div>
+              <div style={{ fontSize: '11px', color: '#475569', lineHeight: 1.4 }}>{desc}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '14px 18px', marginBottom: '32px', fontSize: '13px', color: '#475569', lineHeight: 1.6 }}>
+          Vote YES on an idea in its first 12 hours → it wins → you earn a vested CONV token airdrop.
+          Tokens vest linearly over 90 days after the idea graduates to DEX.
+          The earlier you vote, the larger your multiplier.
+        </div>
+
         {/* Not authenticated */}
         {!isAuthenticated && (
           <div style={{
-            background:   '#111',
-            border:       '1px solid #1e1e1e',
-            borderRadius: '16px',
-            padding:      '48px 32px',
-            textAlign:    'center',
-            maxWidth:     '480px',
-            margin:       '0 auto',
+            background: '#111', border: '1px solid #1e1e1e',
+            borderRadius: '16px', padding: '40px 32px', textAlign: 'center',
           }}>
-            <div style={{ fontSize: '40px', marginBottom: '16px' }}>&#128300;</div>
-            <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px', color: '#f1f5f9' }}>
-              Connect your wallet to check eligibility
+            <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px', color: '#f1f5f9' }}>
+              Check your allocation
             </h2>
             <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>
-              Sign in to see your CONV token allocation from winning idea votes.
+              Connect wallet to see your CONV token allocation from winning idea votes.
             </p>
             <AuthButton />
           </div>

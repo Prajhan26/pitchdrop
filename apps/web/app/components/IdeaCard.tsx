@@ -93,7 +93,7 @@ export function IdeaCard({ idea }: IdeaCardProps) {
           background: idea.pmfScore >= 70 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
           border: `1px solid ${idea.pmfScore >= 70 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
         }}>
-          <span style={{ fontSize: '11px', color: '#475569', fontWeight: 600 }}>⚡ EIGEN AGENT PMF</span>
+          <span style={{ fontSize: '11px', color: '#475569', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.04em' }}>EIGEN PMF</span>
           <span style={{
             fontSize: '14px', fontWeight: 800,
             color: idea.pmfScore >= 70 ? '#10b981' : '#ef4444',
