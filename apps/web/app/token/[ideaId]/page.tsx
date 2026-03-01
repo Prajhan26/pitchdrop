@@ -186,24 +186,38 @@ export default function TokenMarketPage() {
     return (
       <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#f1f5f9' }}>
         <Nav ideaId={ideaId} />
-        <main style={{ maxWidth: '700px', margin: '0 auto', padding: '60px 24px' }}>
+        <main style={{ maxWidth: '700px', margin: '0 auto', padding: '36px 24px 80px' }}>
+
+          {/* Graduation banner */}
           <div style={{
             background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.3)',
-            borderRadius: '16px', padding: '40px 32px', textAlign: 'center',
+            borderRadius: '16px', padding: '28px 32px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: '16px', marginBottom: '28px',
           }}>
-            <p style={{ fontSize: '48px', margin: '0 0 16px' }}>🎓</p>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#fbbf24', margin: '0 0 10px' }}>
-              Graduated to Aerodrome DEX
-            </h2>
-            <p style={{ fontSize: '14px', color: '#78716c', margin: '0 0 24px', lineHeight: 1.6 }}>
-              The curve hit its target. Liquidity migrated to Aerodrome on Base.
-              Builder received their first milestone tranche. Early voters earn vested CONV airdrops.
-            </p>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <span style={{
+                  padding: '3px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 800,
+                  background: 'rgba(251,191,36,0.15)', color: '#fbbf24',
+                  border: '1px solid rgba(251,191,36,0.3)', fontFamily: 'monospace', letterSpacing: '0.06em',
+                }}>
+                  GRADUATED
+                </span>
+                <span style={{ fontSize: '12px', color: '#78716c' }}>Bonding curve complete</span>
+              </div>
+              <h2 style={{ margin: '0 0 6px', fontSize: '20px', fontWeight: 700, color: '#fbbf24' }}>
+                Now trading on Aerodrome DEX
+              </h2>
+              <p style={{ margin: 0, fontSize: '13px', color: '#78716c', lineHeight: 1.6 }}>
+                Liquidity migrated to Base. Builder milestone funding active. Early voters earning airdrops.
+              </p>
+            </div>
             <a
               href="https://aerodrome.finance"
               target="_blank" rel="noopener noreferrer"
               style={{
-                display: 'inline-block', padding: '10px 24px', borderRadius: '8px',
+                flexShrink: 0, padding: '10px 22px', borderRadius: '8px',
                 background: '#fbbf24', color: '#0a0a0a',
                 fontWeight: 700, fontSize: '14px', textDecoration: 'none',
               }}
@@ -211,6 +225,40 @@ export default function TokenMarketPage() {
               Trade on Aerodrome →
             </a>
           </div>
+
+          {/* Stats from the curve run */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '28px' }}>
+            <StatCard label="Total raised" value={totalRaised ? `${fmt(totalRaised, 2)} ETH` : '20 ETH'} sub="bonding curve" />
+            <StatCard label="Total buys"   value={String(events.length)}                                  sub="on-chain trades" />
+            <StatCard label="DEX migration" value="✓ Done"                                                sub="Aerodrome on Base" />
+          </div>
+
+          {/* Full buy history from the curve */}
+          <div style={{
+            background: '#0d0d0d', border: '1px solid #1a1a1a',
+            borderRadius: '14px', padding: '20px',
+          }}>
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              marginBottom: '16px',
+            }}>
+              <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#f1f5f9' }}>
+                Bonding curve trade history
+              </h3>
+              <a
+                href={`https://sepolia.basescan.org/address/${curveAddress}#events`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ fontSize: '12px', color: '#6366f1', textDecoration: 'none' }}
+              >
+                View on Basescan →
+              </a>
+            </div>
+            {historyLoading
+              ? <p style={{ fontSize: '13px', color: '#374151', textAlign: 'center', padding: '20px 0' }}>Loading…</p>
+              : <BuyChart events={events} target={graduationTarget} />
+            }
+          </div>
+
         </main>
       </div>
     )
