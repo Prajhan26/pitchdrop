@@ -113,7 +113,7 @@ export function IdeaCard({ idea }: IdeaCardProps) {
               : null}
         </p>
         {(idea.voteCount ?? 0) > 0 && (
-          <span style={{ fontSize: '11px', color: '#374151', fontFamily: 'monospace' }}>
+          <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
             {idea.voteCount} voter{idea.voteCount !== 1 ? 's' : ''}
           </span>
         )}
@@ -128,11 +128,11 @@ export function IdeaCard({ idea }: IdeaCardProps) {
           border: `1px solid ${idea.pmfScore >= 70 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
         }}>
           <span style={{ fontSize: '11px', color: '#475569', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.04em' }}>EIGEN PMF</span>
-          <span style={{ fontSize: '10px', color: '#374151' }}>score</span>
+          <span style={{ fontSize: '10px', color: '#94a3b8' }}>score</span>
           <span style={{ fontSize: '14px', fontWeight: 800, color: idea.pmfScore >= 70 ? '#10b981' : '#ef4444' }}>
             {idea.pmfScore}
           </span>
-          <span style={{ fontSize: '11px', color: '#475569' }}>/100</span>
+          <span style={{ fontSize: '11px', color: '#94a3b8' }}>/100</span>
         </div>
       )}
 
@@ -154,13 +154,13 @@ export function IdeaCard({ idea }: IdeaCardProps) {
             style={{
               background: 'transparent', border: '1px solid #222',
               borderRadius: '6px', padding: '5px 12px',
-              fontSize: '11px', fontWeight: 700, color: '#475569',
+              fontSize: '11px', fontWeight: 700, color: '#94a3b8',
               cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
               fontFamily: 'monospace', letterSpacing: '0.04em',
             }}
           >
             <span>⚡ EIGEN ANALYSIS</span>
-            <span style={{ color: '#374151' }}>{showAnalysis ? '▲' : '▼'}</span>
+            <span style={{ color: '#64748b' }}>{showAnalysis ? '▲' : '▼'}</span>
           </button>
 
           {showAnalysis && (

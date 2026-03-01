@@ -29,7 +29,75 @@ function shortAddr(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`
 }
 
-// ─── Buy history mini-chart ───────────────────────────────────────────────────
+// ─── Price line chart ─────────────────────────────────────────────────────────
+
+function PriceChart({ events }: { events: BuyEvent[] }) {
+  const ordered = [...events].reverse() // oldest first
+  if (ordered.length < 2) return null
+
+  // Price per token = ethIn / tokensOut  (in ETH, scaled for display)
+  const prices = ordered.map(e => {
+    const eth = Number(e.ethIn)
+    const tok = Number(e.tokensOut)
+    return tok > 0 ? (eth / tok) * 1e14 : 0   // scale to readable numbers
+  })
+
+  const W = 600, H = 100
+  const maxP = Math.max(...prices)
+  const minP = Math.min(...prices)
+  const pad  = 8
+  const range = maxP - minP || maxP * 0.2 || 1
+
+  const pts = prices.map((p, i) => {
+    const x = pad + (i / (prices.length - 1)) * (W - pad * 2)
+    const y = pad + (1 - (p - minP) / range) * (H - pad * 2)
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  })
+  const linePoints = pts.join(' ')
+  const areaPoints = `${pad},${H} ${linePoints} ${(W - pad).toFixed(1)},${H}`
+
+  const lastPrice = prices[prices.length - 1]
+  const firstPrice = prices[0]
+  const pctChange = firstPrice > 0 ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'monospace' }}>
+            Price chart
+          </span>
+          <span style={{ marginLeft: '10px', fontSize: '11px', color: pctChange >= 0 ? '#10b981' : '#ef4444', fontWeight: 700 }}>
+            {pctChange >= 0 ? '+' : ''}{pctChange.toFixed(1)}% since first buy
+          </span>
+        </div>
+        <span style={{ fontSize: '11px', color: '#475569', fontFamily: 'monospace' }}>{ordered.length} trades</span>
+      </div>
+      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: '100px', display: 'block' }}>
+          <defs>
+            <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#10b981" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+          <polygon points={areaPoints} fill="url(#priceGrad)" />
+          <polyline points={linePoints} fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Last price dot */}
+          {pts.length > 0 && (
+            <circle
+              cx={pts[pts.length - 1].split(',')[0]}
+              cy={pts[pts.length - 1].split(',')[1]}
+              r="4" fill="#10b981"
+            />
+          )}
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+// ─── Buy history ──────────────────────────────────────────────────────────────
 
 function BuyChart({ events, target }: { events: BuyEvent[]; target: bigint | undefined }) {
   if (events.length === 0) {
@@ -113,12 +181,12 @@ function BuyChart({ events, target }: { events: BuyEvent[]; target: bigint | und
               <span style={{ color: '#94a3b8', fontWeight: 600 }}>
                 {fmt(e.ethIn, 4)} ETH
               </span>
-              <span style={{ color: '#475569' }}>→</span>
-              <span style={{ color: '#f1f5f9', fontWeight: 600 }}>
+              <span style={{ color: '#64748b' }}>→</span>
+              <span style={{ color: '#e2e8f0', fontWeight: 600 }}>
                 {fmt(e.tokensOut, 0)} tokens
               </span>
-              <span style={{ color: '#374151', fontSize: '11px' }}>
-                ({fmt(e.totalRaised, 4)} raised)
+              <span style={{ color: '#64748b', fontSize: '11px' }}>
+                ({fmt(e.totalRaised, 4)} ETH raised)
               </span>
             </div>
           </div>
@@ -294,7 +362,7 @@ export default function TokenMarketPage() {
           <h1 style={{ margin: '0 0 6px', fontSize: '24px', fontWeight: 700 }}>
             Token Market
           </h1>
-          <p style={{ margin: 0, fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>
+          <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
             This idea won the community vote. Its token is now live on a bonding curve —
             price rises with every buy. Early voters earn vested token airdrops at graduation.
           </p>
@@ -424,7 +492,7 @@ export default function TokenMarketPage() {
           </p>
         </div>
 
-        {/* ── Buy history ───────────────────────────────────────────────────── */}
+        {/* ── Price chart + trade history ───────────────────────────────────── */}
         <div style={{
           background: '#0d0d0d', border: '1px solid #1a1a1a',
           borderRadius: '14px', padding: '20px',
@@ -434,21 +502,25 @@ export default function TokenMarketPage() {
             marginBottom: '16px',
           }}>
             <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#f1f5f9' }}>
-              Trade History
+              Live Trading
             </h3>
             <a
               href={`https://sepolia.basescan.org/address/${curveAddress}#events`}
               target="_blank" rel="noopener noreferrer"
-              style={{ fontSize: '12px', color: '#6366f1', textDecoration: 'none' }}
+              style={{ fontSize: '12px', color: '#6366f1', textDecoration: 'none', fontWeight: 600 }}
             >
-              View on Basescan →
+              Basescan →
             </a>
           </div>
 
-          {historyLoading
-            ? <p style={{ fontSize: '13px', color: '#374151', textAlign: 'center', padding: '20px 0' }}>Loading…</p>
-            : <BuyChart events={events} target={graduationTarget} />
-          }
+          {historyLoading ? (
+            <p style={{ fontSize: '13px', color: '#64748b', textAlign: 'center', padding: '20px 0' }}>Loading trades…</p>
+          ) : (
+            <>
+              <PriceChart events={events} />
+              <BuyChart events={events} target={graduationTarget} />
+            </>
+          )}
         </div>
 
         {/* ── What happens next ─────────────────────────────────────────────── */}

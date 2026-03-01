@@ -136,7 +136,7 @@ export default function Home() {
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#f1f5f9', fontFamily: 'monospace' }}>
                 {value}
               </div>
-              <div style={{ fontSize: '11px', color: '#374151', marginTop: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {label}
               </div>
             </div>
@@ -162,7 +162,7 @@ export default function Home() {
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', marginBottom: '8px' }}>
                   {title}
                 </div>
-                <div style={{ fontSize: '13px', color: '#475569', lineHeight: 1.6 }}>
+                <div style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
                   {desc}
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function Home() {
                 }}>
                   {tag}
                 </span>
-                <span style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>{desc}</span>
+                <span style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.5 }}>{desc}</span>
               </div>
             ))}
           </div>
@@ -236,11 +236,11 @@ export default function Home() {
           { label: 'Airdrop',      href: '/airdrop' },
           { label: 'Sovereign Agent', href: '/agent' },
         ].map(({ label, href }) => (
-          <Link key={href} href={href} style={{ fontSize: '13px', color: '#374151', textDecoration: 'none' }}>
+          <Link key={href} href={href} style={{ fontSize: '13px', color: '#64748b', textDecoration: 'none' }}>
             {label}
           </Link>
         ))}
-        <span style={{ fontSize: '12px', color: '#1f1f1f', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: '12px', color: '#374151', fontFamily: 'monospace' }}>
           Base Sepolia · EigenCloud TEE
         </span>
       </footer>
@@ -253,7 +253,7 @@ export default function Home() {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
-      fontSize: '11px', fontWeight: 700, color: '#374151',
+      fontSize: '11px', fontWeight: 700, color: '#6b7280',
       letterSpacing: '0.08em', textTransform: 'uppercase',
       marginBottom: '16px',
     }}>

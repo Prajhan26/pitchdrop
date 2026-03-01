@@ -64,7 +64,7 @@ export default function FeedPage() {
             Sign in to vote and earn token airdrops on winning ideas
           </span>
           <AuthButton />
-          <span style={{ fontSize: '11px', color: '#374151' }}>powered by Privy · email or Google</span>
+          <span style={{ fontSize: '11px', color: '#64748b' }}>powered by Privy · email or Google</span>
         </div>
       )}
 

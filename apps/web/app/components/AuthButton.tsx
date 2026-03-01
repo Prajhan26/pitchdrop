@@ -5,60 +5,54 @@ import { useAuth } from '../hooks/useAuth'
 export function AuthButton() {
   const { ready, isAuthenticated, walletAddress, login, logout } = useAuth()
 
-  if (!ready) {
-    return (
-      <button disabled style={buttonStyle}>
-        Loading…
-      </button>
-    )
-  }
-
   if (isAuthenticated) {
     const short = walletAddress
       ? `${walletAddress.slice(0, 6)}…${walletAddress.slice(-4)}`
       : 'connected'
-
     return (
       <div style={rowStyle}>
         <span style={addressStyle}>{short}</span>
-        <button onClick={logout} style={buttonStyle}>
-          Sign out
-        </button>
+        <button onClick={logout} style={buttonStyle}>Sign out</button>
       </div>
     )
   }
 
+  // Show the sign-in button immediately — works once Privy is ready (instant or ~1s)
   return (
-    <button onClick={login} style={{ ...buttonStyle, ...primaryStyle }}>
-      Sign in
+    <button
+      onClick={ready ? login : undefined}
+      style={{ ...buttonStyle, ...primaryStyle, opacity: ready ? 1 : 0.7 }}
+    >
+      {ready ? 'Connect wallet' : 'Connect wallet'}
     </button>
   )
 }
 
 const buttonStyle: React.CSSProperties = {
-  padding: '8px 16px',
+  padding: '8px 18px',
   borderRadius: '8px',
-  border: '1px solid #333',
+  border: 'none',
   background: 'transparent',
   color: 'inherit',
   cursor: 'pointer',
-  fontSize: '14px',
+  fontSize: '13px',
+  fontWeight: 600,
+  transition: 'opacity 0.2s',
 }
 
 const primaryStyle: React.CSSProperties = {
   background: '#6366f1',
   color: '#fff',
-  border: 'none',
 }
 
 const rowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '12px',
+  gap: '10px',
 }
 
 const addressStyle: React.CSSProperties = {
   fontFamily: 'monospace',
-  fontSize: '13px',
-  opacity: 0.7,
+  fontSize: '12px',
+  color: '#94a3b8',
 }

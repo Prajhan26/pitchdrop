@@ -172,7 +172,7 @@ export default function AgentPage() {
 
         {/* ── What EigenCloud guarantees ────────────────────────────────────── */}
         <div style={{ marginBottom: '40px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#374151', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
             What EigenCloud guarantees
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -190,7 +190,7 @@ export default function AgentPage() {
                   {tag}
                 </div>
                 <div style={{ fontSize: '13px', fontWeight: 600, color: '#e2e8f0', marginBottom: '4px' }}>{title}</div>
-                <div style={{ fontSize: '12px', color: '#475569', lineHeight: 1.5 }}>{desc}</div>
+                <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.5 }}>{desc}</div>
               </div>
             ))}
           </div>
@@ -198,9 +198,87 @@ export default function AgentPage() {
 
         {/* ── Agent modules ─────────────────────────────────────────────────── */}
         <div style={{ marginBottom: '40px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#374151', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '20px' }}>
             Agent modules
           </div>
+
+          {/* ── Orbital flywheel diagram ── */}
+          <div style={{ position: 'relative', width: '360px', height: '360px', margin: '0 auto 32px' }}>
+            <svg width="360" height="360" style={{ position: 'absolute', inset: 0 }}>
+              {/* Dashed orbit ring */}
+              <circle cx="180" cy="180" r="120" fill="none" stroke="#1a2535" strokeWidth="1.5" strokeDasharray="6 5" />
+              {/* Spoke lines — module edge to center circle edge */}
+              <line x1="180" y1="98"  x2="180" y2="141" stroke="#1e2d3d" strokeWidth="1" />
+              <line x1="219" y1="180" x2="262" y2="180" stroke="#1e2d3d" strokeWidth="1" />
+              <line x1="180" y1="219" x2="180" y2="262" stroke="#1e2d3d" strokeWidth="1" />
+              <line x1="98"  y1="180" x2="141" y2="180" stroke="#1e2d3d" strokeWidth="1" />
+            </svg>
+
+            {/* Center — Sovereign Agent */}
+            <div style={{
+              position: 'absolute', left: '141px', top: '141px',
+              width: '78px', height: '78px', borderRadius: '50%',
+              background: 'rgba(99,102,241,0.14)', border: '2px solid rgba(99,102,241,0.5)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px',
+            }}>
+              <span style={{ fontSize: '22px', lineHeight: 1 }}>⚡</span>
+              <span style={{ fontSize: '8px', fontWeight: 800, color: '#818cf8', textAlign: 'center',
+                fontFamily: 'monospace', lineHeight: 1.2, letterSpacing: '0.04em' }}>
+                SOVEREIGN<br />AGENT
+              </span>
+            </div>
+
+            {/* N — BullBear (top) */}
+            <div style={{
+              position: 'absolute', left: '142px', top: '22px',
+              width: '76px', height: '76px', borderRadius: '50%',
+              background: 'rgba(99,102,241,0.08)', border: '2px solid rgba(99,102,241,0.4)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px',
+            }}>
+              <span style={{ fontSize: '22px', lineHeight: 1 }}>📊</span>
+              <span style={{ fontSize: '8px', fontWeight: 700, color: '#818cf8', textAlign: 'center',
+                fontFamily: 'monospace', lineHeight: 1.2 }}>BULLBEAR</span>
+            </div>
+
+            {/* E — Attestation (right) */}
+            <div style={{
+              position: 'absolute', left: '262px', top: '142px',
+              width: '76px', height: '76px', borderRadius: '50%',
+              background: 'rgba(16,185,129,0.08)', border: '2px solid rgba(16,185,129,0.4)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px',
+            }}>
+              <span style={{ fontSize: '22px', lineHeight: 1 }}>🔏</span>
+              <span style={{ fontSize: '8px', fontWeight: 700, color: '#34d399', textAlign: 'center',
+                fontFamily: 'monospace', lineHeight: 1.2 }}>ATTEST</span>
+            </div>
+
+            {/* S — Milestone (bottom) */}
+            <div style={{
+              position: 'absolute', left: '142px', top: '262px',
+              width: '76px', height: '76px', borderRadius: '50%',
+              background: 'rgba(245,158,11,0.08)', border: '2px solid rgba(245,158,11,0.4)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px',
+            }}>
+              <span style={{ fontSize: '22px', lineHeight: 1 }}>🏗️</span>
+              <span style={{ fontSize: '8px', fontWeight: 700, color: '#fbbf24', textAlign: 'center',
+                fontFamily: 'monospace', lineHeight: 1.2 }}>MILESTONE</span>
+            </div>
+
+            {/* W — OFAC (left) */}
+            <div style={{
+              position: 'absolute', left: '22px', top: '142px',
+              width: '76px', height: '76px', borderRadius: '50%',
+              background: 'rgba(16,185,129,0.08)', border: '2px solid rgba(16,185,129,0.4)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px',
+            }}>
+              <span style={{ fontSize: '22px', lineHeight: 1 }}>🛡️</span>
+              <span style={{ fontSize: '8px', fontWeight: 700, color: '#34d399', textAlign: 'center',
+                fontFamily: 'monospace', lineHeight: 1.2 }}>OFAC</span>
+              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+            </div>
+          </div>
+
+          {/* Module detail cards */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {MODULES.map(({ id, name, status, accent, bg, icon, tagline, what, how, note }) => (
               <div key={id} style={{
@@ -223,7 +301,7 @@ export default function AgentPage() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                    <span style={{ fontFamily: 'monospace', fontSize: '10px', fontWeight: 800, color: '#374151' }}>{id}</span>
+                    <span style={{ fontFamily: 'monospace', fontSize: '10px', fontWeight: 800, color: '#64748b' }}>{id}</span>
                     <span style={{
                       padding: '2px 8px', borderRadius: '4px',
                       fontSize: '9px', fontWeight: 800, fontFamily: 'monospace', letterSpacing: '0.06em',
@@ -237,11 +315,11 @@ export default function AgentPage() {
                 </div>
                 <div style={{ height: '1px', background: `${accent}15` }} />
                 <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8', lineHeight: 1.6 }}>{what}</p>
-                <p style={{ margin: 0, fontSize: '11px', color: '#475569', lineHeight: 1.55 }}>{how}</p>
+                <p style={{ margin: 0, fontSize: '11px', color: '#64748b', lineHeight: 1.55 }}>{how}</p>
                 <div style={{
                   padding: '4px 10px', borderRadius: '4px', alignSelf: 'flex-start',
                   background: '#0a0a0a', border: `1px solid ${accent}15`,
-                  fontSize: '10px', color: '#374151', fontFamily: 'monospace',
+                  fontSize: '10px', color: '#64748b', fontFamily: 'monospace',
                 }}>
                   {note}
                 </div>
@@ -252,7 +330,7 @@ export default function AgentPage() {
 
         {/* ── End-to-end flow ───────────────────────────────────────────────── */}
         <div style={{ marginBottom: '40px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#374151', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
             End-to-end flow
           </div>
           <div style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '20px' }}>
@@ -276,7 +354,7 @@ export default function AgentPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 600, color: '#e2e8f0', marginBottom: '2px' }}>{label}</div>
-                  <div style={{ fontSize: '11px', color: '#374151', fontFamily: 'monospace' }}>{sub}</div>
+                  <div style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>{sub}</div>
                 </div>
               </div>
             ))}
@@ -285,7 +363,7 @@ export default function AgentPage() {
 
         {/* ── Contracts ─────────────────────────────────────────────────────── */}
         <div>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#374151', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
             Contracts — Base Sepolia
           </div>
           <div style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: '12px', overflow: 'hidden' }}>
