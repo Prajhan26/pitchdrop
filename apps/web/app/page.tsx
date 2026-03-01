@@ -18,13 +18,13 @@ const FLOW_STEPS = [
   {
     num:   '03',
     title: 'Token launches instantly',
-    desc:  'Winning ideas get a CONV token on Base L2. Price rises with every buy on the bonding curve.',
+    desc:  'The winning idea gets its own token on Base L2. Price rises with every buy on the bonding curve — no listing needed, trading starts immediately.',
     color: '#f59e0b',
   },
   {
     num:   '04',
     title: 'Early voters earn airdrops',
-    desc:  'T1/T2/T3 scouts receive vested CONV airdrops. The earlier you voted, the larger your share.',
+    desc:  'Scouts who voted YES on winning ideas receive vested token airdrops. The earlier you voted, the larger your share — T1 earns 3× more than T3.',
     color: '#f97316',
   },
 ]
@@ -210,7 +210,7 @@ export default function Home() {
           </div>
           <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '28px', lineHeight: 1.7, maxWidth: '440px', margin: '0 auto 28px' }}>
             The crowd is voting on the next wave of crypto products right now.
-            Every YES on a winning idea earns you a vested CONV token airdrop.
+            Every YES on a winning idea earns you a vested token airdrop.
           </p>
           <Link href="/feed" style={{
             display: 'inline-block',

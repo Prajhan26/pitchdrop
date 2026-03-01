@@ -204,7 +204,7 @@ function IdeaCard({
             <span>
               Your allocation:{' '}
               <strong style={{ color: '#f1f5f9' }}>
-                {idea.allocation.toLocaleString()} CONV
+                {idea.allocation.toLocaleString()} tokens
               </strong>
             </span>
             <span>
@@ -276,7 +276,7 @@ export default function AirdropPage() {
           Airdrop Eligibility
         </h1>
         <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '40px' }}>
-          CONV token allocations for early scouts who voted YES on winning ideas.
+          Token allocations for early scouts who voted YES on winning ideas.
         </p>
 
         {/* Tier explainer — always visible */}
@@ -298,7 +298,7 @@ export default function AirdropPage() {
         </div>
 
         <div style={{ background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: '12px', padding: '14px 18px', marginBottom: '32px', fontSize: '13px', color: '#475569', lineHeight: 1.6 }}>
-          Vote YES on an idea in its first 12 hours → it wins → you earn a vested CONV token airdrop.
+          Vote YES on an idea in its first 12 hours → it wins → you earn a vested token airdrop.
           Tokens vest linearly over 90 days after the idea graduates to DEX.
           The earlier you vote, the larger your multiplier.
         </div>
@@ -313,7 +313,7 @@ export default function AirdropPage() {
               Check your allocation
             </h2>
             <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>
-              Connect wallet to see your CONV token allocation from winning idea votes.
+              Connect wallet to see your token allocation from winning idea votes.
             </p>
             <AuthButton />
           </div>
@@ -355,7 +355,7 @@ export default function AirdropPage() {
                     {data.totalAllocation.toLocaleString()}
                   </div>
                   <div style={{ fontSize: '16px', color: '#94a3b8', marginTop: '4px', fontWeight: 500 }}>
-                    CONV tokens eligible
+                    tokens eligible
                   </div>
                 </div>
 

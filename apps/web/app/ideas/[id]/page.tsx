@@ -103,7 +103,7 @@ export default function IdeaDetailPage() {
                     href={`/token/${idea.onchainId}?curve=${idea.curveAddr}`}
                     style={tradeBadgeStyle}
                   >
-                    Trade CONV
+                    Buy the token
                   </Link>
                 )}
               </div>

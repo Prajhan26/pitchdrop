@@ -174,7 +174,7 @@ export default function TokenMarketPage() {
             Trading opens after the community vote
           </h2>
           <p style={{ fontSize: '14px', color: '#64748b' }}>
-            Once this idea reaches 69% approval the CONV token launches automatically.
+            Once this idea reaches 69% approval its token launches automatically for trading.
           </p>
         </main>
       </div>
@@ -340,7 +340,7 @@ export default function TokenMarketPage() {
                 }}>
                   {quoteLoading ? 'Calculating…'
                     : tokensOut !== undefined
-                      ? <>→ <strong style={{ color: '#f1f5f9' }}>{fmt(tokensOut, 0)} CONV</strong></>
+                      ? <>→ <strong style={{ color: '#f1f5f9' }}>{fmt(tokensOut, 0)} tokens</strong></>
                       : 'Enter ETH amount'}
                 </div>
                 <button
@@ -463,7 +463,7 @@ export default function TokenMarketPage() {
             {[
               { icon: '💧', text: '85% of raised ETH → Aerodrome liquidity pool. Token trades on open DEX from day 1.' },
               { icon: '🏗️', text: 'Builder submits milestone proof → EigenCloud agent verifies → BuildFund releases the tranche.' },
-              { icon: '🎁', text: 'Early voters (T1/T2/T3) receive vested CONV airdrops. T1 = 3× multiplier, vests over 90 days.' },
+              { icon: '🎁', text: 'Early voters (T1/T2/T3) receive vested token airdrops. T1 = 3× multiplier, vests over 90 days.' },
               { icon: '⚡', text: 'No admin key. The Sovereign Agent is the only authority on fund release.' },
             ].map(({ icon, text }) => (
               <div key={icon} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
