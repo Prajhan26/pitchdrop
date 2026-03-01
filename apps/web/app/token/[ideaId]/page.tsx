@@ -84,9 +84,9 @@ function PriceChart({ events }: { events: BuyEvent[] }) {
   const linePoints = pts.join(' ')
   const areaPoints = `${pad},${H} ${linePoints} ${(W - pad).toFixed(1)},${H}`
 
-  const lastPrice = prices[prices.length - 1]
-  const firstPrice = prices[0]
-  const pctChange = firstPrice > 0 ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0
+  const lastPrice  = prices[prices.length - 1] ?? 0
+  const firstPrice = prices[0] ?? 0
+  const pctChange  = firstPrice > 0 ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0
 
   return (
     <div style={{ marginBottom: '20px' }}>
@@ -112,13 +112,11 @@ function PriceChart({ events }: { events: BuyEvent[] }) {
           <polygon points={areaPoints} fill="url(#priceGrad)" />
           <polyline points={linePoints} fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           {/* Last price dot */}
-          {pts.length > 0 && (
-            <circle
-              cx={pts[pts.length - 1].split(',')[0]}
-              cy={pts[pts.length - 1].split(',')[1]}
-              r="4" fill="#10b981"
-            />
-          )}
+          {pts.length > 0 && (() => {
+            const last = pts[pts.length - 1]!
+            const [cx, cy] = last.split(',')
+            return <circle cx={cx} cy={cy} r="4" fill="#10b981" />
+          })()}
         </svg>
       </div>
     </div>
