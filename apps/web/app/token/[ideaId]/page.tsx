@@ -361,14 +361,8 @@ export default function TokenMarketPage() {
             </div>
           </div>
 
-          {/* Chart — full width, no padding */}
-          {historyLoading ? (
-            <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: '13px', color: '#64748b' }}>Loading chart…</span>
-            </div>
-          ) : (
-            <PriceChart events={displayEvents} />
-          )}
+          {/* Chart — always visible; DEMO_EVENTS fallback means no blank state */}
+          <PriceChart events={displayEvents} />
         </div>
 
         {/* ── Graduation progress bar ──────────────────────────────────────── */}
@@ -476,11 +470,7 @@ export default function TokenMarketPage() {
           <div style={{ fontSize: '13px', fontWeight: 700, color: '#f1f5f9', marginBottom: '12px' }}>
             Recent trades
           </div>
-          {historyLoading ? (
-            <p style={{ fontSize: '13px', color: '#64748b', padding: '10px 0' }}>Loading…</p>
-          ) : (
-            <TradeRows events={displayEvents} target={graduationTarget} />
-          )}
+          <TradeRows events={displayEvents} target={graduationTarget} />
         </div>
 
         {/* ── EigenCloud milestone release tracker ──────────────────────────── */}
