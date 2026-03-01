@@ -89,7 +89,7 @@ export default function FeedPage() {
                       href={`/token/${idea.onchainId}?curve=${idea.curveAddr}`}
                       style={tradeLinkStyle}
                     >
-                      Trade CONV →
+                      Buy the token →
                     </Link>
                   ) : (
                     <span style={{
@@ -98,7 +98,7 @@ export default function FeedPage() {
                       border: '1px solid #1e1e1e', background: '#111',
                       fontFamily: 'monospace',
                     }}>
-                      Token curve deploying…
+                      Token launching…
                     </span>
                   )}
                 </div>

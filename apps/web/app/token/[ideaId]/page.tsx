@@ -65,7 +65,7 @@ function BuyChart({ events, target }: { events: BuyEvent[]; target: bigint | und
           return (
             <div
               key={i}
-              title={`${fmt(e.ethIn, 4)} ETH → ${fmt(e.tokensOut, 0)} CONV`}
+              title={`${fmt(e.ethIn, 4)} ETH → ${fmt(e.tokensOut, 0)} tokens`}
               style={{
                 flex: 1, maxWidth: '32px',
                 height: `${h}px`,
@@ -115,7 +115,7 @@ function BuyChart({ events, target }: { events: BuyEvent[]; target: bigint | und
               </span>
               <span style={{ color: '#475569' }}>→</span>
               <span style={{ color: '#f1f5f9', fontWeight: 600 }}>
-                {fmt(e.tokensOut, 0)} CONV
+                {fmt(e.tokensOut, 0)} tokens
               </span>
               <span style={{ color: '#374151', fontSize: '11px' }}>
                 ({fmt(e.totalRaised, 4)} raised)
@@ -244,11 +244,11 @@ export default function TokenMarketPage() {
             </span>
           </div>
           <h1 style={{ margin: '0 0 6px', fontSize: '24px', fontWeight: 700 }}>
-            CONV Token · Pitch #{ideaId}
+            Token Market
           </h1>
           <p style={{ margin: 0, fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>
-            Community approved this idea. Token is live — buy in now, price rises with every purchase.
-            Builder submits milestones to unlock funding. Early voters earn vested CONV airdrops.
+            This idea won the community vote. Its token is now live on a bonding curve —
+            price rises with every buy. Early voters earn vested token airdrops at graduation.
           </p>
         </div>
 
@@ -262,7 +262,7 @@ export default function TokenMarketPage() {
             gridColumn: isAuthenticated ? undefined : '1 / -1',
           }}>
             <div style={{ fontSize: '14px', fontWeight: 600, color: '#f1f5f9', marginBottom: '14px' }}>
-              Buy CONV
+              Buy tokens
             </div>
 
             {!isAuthenticated ? (
@@ -343,7 +343,7 @@ export default function TokenMarketPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <StatCard label="ETH Raised" value={totalRaised ? `${fmt(totalRaised, 4)} ETH` : '—'} sub="of 20 ETH target" />
               <StatCard label="Buys" value={String(events.length)} sub="on-chain transactions" />
-              <StatCard label="Builder fund" value="Milestone" sub="agent verifies → releases" />
+              <StatCard label="Builder fund" value="Milestone-based" sub="agent verifies → releases" />
             </div>
           )}
         </div>
