@@ -92,15 +92,55 @@ async function seedDemoIfEmpty() {
   }
 }
 
-// Wire the deployed BondingCurve addresses for demo won ideas.
-// Safe to run on every startup — only updates rows that still have null curveAddr.
-async function wireDemoCurveAddresses() {
+// Wire demo content — curve addresses + bull/bear analysis for all demo ideas.
+// Runs every startup, only updates fields that are still null.
+async function wireDemoContent() {
   const db = new PrismaClient()
   try {
-    await db.idea.updateMany({
-      where: { onchainId: 'demo-won-1', curveAddr: null },
-      data:  { curveAddr: '0x75574c9a30345dc2affbde778efef41c18b1e351' },
-    })
+    const DEMO_CONTENT: Record<string, { bullCase: string; bearCase: string; curveAddr?: string }> = {
+      'demo-1': {
+        bullCase: 'Browser extensions are a proven distribution wedge. Blind signing is a universal pain point — every crypto user has felt it. High retention product with built-in virality: you share it before every transaction.',
+        bearCase: 'Requires constant maintenance as contracts evolve. False positives will cause users to disable it. Wallet providers may build this natively and cut off the extension.',
+      },
+      'demo-2': {
+        bullCase: 'Soulbound credentials are inevitable — this is LinkedIn for web3. Massive TAM across all remote work. Network effects lock in early movers permanently.',
+        bearCase: 'Aggregating across Web2 + Web3 platforms is deeply complex. Privacy concerns are real. Employers may resist adopting a new credential standard.',
+      },
+      'demo-3': {
+        bullCase: 'Polymarket proved massive liquidity exists for real-world outcomes. VC deal flow is verifiable via Crunchbase. Unique alpha source that attracts serious money.',
+        bearCase: 'Close vote split signals market skepticism. Information asymmetry favours insiders. Regulatory risk as a securities-adjacent product is significant.',
+      },
+      'demo-4': {
+        bullCase: 'Airbnb takes 15–20% in fees — massive disintermediation opportunity. Escrow smart contracts solve the trust problem elegantly without a middleman.',
+        bearCase: 'Legal liability for physical property disputes is hard to avoid. Identity verification off-chain is still required. Airbnb has a massive moat in trust and brand.',
+      },
+      'demo-won-1': {
+        bullCase: 'friend.tech proved people pay to be in rooms with people they respect. Native token creates powerful incentive alignment between hosts and members.',
+        bearCase: 'Most groups go stale — retention is the core risk. Token mechanics can create pump-and-dump dynamics that destroy the community they were meant to incentivise.',
+        curveAddr: '0x75574c9a30345dc2affbde778efef41c18b1e351',
+      },
+      'demo-won-2': {
+        bullCase: 'Open-source hardware is exploding. NFC royalty verification is an elegant primitive. The creator economy for hardware engineers is completely wide open.',
+        bearCase: 'Manufacturing rights enforcement across jurisdictions is an unsolved legal problem. The market of hardware engineers who publish designs is still small.',
+      },
+      'demo-rip-1': {
+        bullCase: 'Loyalty programs are stale and ripe for disruption. NFT ownership creates a secondary market for loyalty points that traditional schemes cannot offer.',
+        bearCase: 'Coffee is a low-margin hyperlocal business. Crypto adds friction without solving a real consumer problem. The crowd saw no compelling wedge.',
+      },
+    }
+
+    for (const [onchainId, content] of Object.entries(DEMO_CONTENT)) {
+      await db.idea.updateMany({
+        where: { onchainId, bullCase: null },
+        data:  { bullCase: content.bullCase, bearCase: content.bearCase },
+      })
+      if (content.curveAddr) {
+        await db.idea.updateMany({
+          where: { onchainId, curveAddr: null },
+          data:  { curveAddr: content.curveAddr },
+        })
+      }
+    }
   } finally {
     await db.$disconnect()
   }
@@ -123,7 +163,7 @@ app.register(milestonesRoutes)
 const start = async () => {
   try {
     await seedDemoIfEmpty()
-    await wireDemoCurveAddresses()
+    await wireDemoContent()
     await app.listen({ port: Number(process.env.PORT) || 3001, host: '0.0.0.0' })
     // Start the on-chain event indexer after the HTTP server is up.
     // No-ops gracefully if contract addresses are not set.

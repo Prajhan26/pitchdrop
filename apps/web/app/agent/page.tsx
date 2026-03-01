@@ -39,40 +39,52 @@ const GUARANTEES = [
 
 const MODULES = [
   {
-    id:     '01',
-    name:   'BullBear Evaluator',
-    status: 'built',
-    color:  '#6366f1',
-    what:   'Generates a PMF conviction score (0–100) for every active idea using Claude AI.',
-    how:    'Runs Claude claude-sonnet-4-6 inside the TEE. Vote weights + idea text → bull case + bear case + score. The score you see on won idea cards is produced here.',
-    note:   'Code complete · TEE deployment is the production step',
+    id:      '01',
+    name:    'BullBear Evaluator',
+    status:  'built',
+    accent:  '#6366f1',
+    bg:      'rgba(99,102,241,0.05)',
+    icon:    '📊',
+    tagline: 'AI conviction scoring',
+    what:    'Generates a PMF conviction score (0–100) for every active idea using Claude AI.',
+    how:     'Runs Claude claude-sonnet-4-6 inside the TEE. Vote weights + idea text → bull case + bear case + score. The score on won idea cards is produced here.',
+    note:    'Code complete · TEE deployment is the production step',
   },
   {
-    id:     '02',
-    name:   'Attestation Worker',
-    status: 'built',
-    color:  '#10b981',
-    what:   'Commits every resolved idea result to EigenDA and posts the reference on-chain.',
-    how:    'keccak256(ideaId + voteWeights + timestamp + pmfScore) → EigenDA blob → SovereignAgent.postAttestation(eigenDaRef). Contract is deployed and ready.',
-    note:   'Hash logic complete · contract deployed · EigenDA posting is the production step',
+    id:      '02',
+    name:    'Attestation Worker',
+    status:  'built',
+    accent:  '#10b981',
+    bg:      'rgba(16,185,129,0.05)',
+    icon:    '🔏',
+    tagline: 'On-chain data availability',
+    what:    'Commits every resolved idea result to EigenDA and posts the reference on-chain.',
+    how:     'keccak256(ideaId + voteWeights + timestamp + pmfScore) → EigenDA blob → SovereignAgent.postAttestation(eigenDaRef). Contract deployed and ready.',
+    note:    'Hash logic complete · contract deployed · EigenDA posting is the production step',
   },
   {
-    id:     '03',
-    name:   'Milestone Evaluator',
-    status: 'built',
-    color:  '#f59e0b',
-    what:   'Evaluates builder milestone evidence and triggers fund release.',
-    how:    'Builder submits proof → Claude AI inside TEE reviews it → confidence score → if approved, calls BuildFund.release(tranche). No multisig, no human.',
-    note:   'Evaluation logic complete · BuildFund.sol deployed · live trigger is the production step',
+    id:      '03',
+    name:    'Milestone Evaluator',
+    status:  'built',
+    accent:  '#f59e0b',
+    bg:      'rgba(245,158,11,0.05)',
+    icon:    '🏗️',
+    tagline: 'Trustless fund release',
+    what:    'Evaluates builder milestone evidence and triggers BuildFund release. No multisig, no human.',
+    how:     'Builder submits proof → Claude AI inside TEE reviews it → confidence score → if approved, calls BuildFund.release(tranche). Powered by EigenCloud.',
+    note:    'Evaluation logic complete · BuildFund.sol deployed · live trigger is the production step',
   },
   {
-    id:     '04',
-    name:   'OFAC Screener',
-    status: 'live',
-    color:  '#f1f5f9',
-    what:   'Screens every wallet against OFAC sanctions before any vote or airdrop claim.',
-    how:    'TRM Labs API call on every interaction. Sanctioned addresses are rejected at the indexer API layer before any on-chain transaction.',
-    note:   'Live on Railway indexer right now',
+    id:      '04',
+    name:    'OFAC Screener',
+    status:  'live',
+    accent:  '#10b981',
+    bg:      'rgba(16,185,129,0.08)',
+    icon:    '🛡️',
+    tagline: 'Compliance — live now',
+    what:    'Screens every wallet against OFAC sanctions before any vote or airdrop claim.',
+    how:     'TRM Labs API call on every interaction. Sanctioned addresses are rejected at the indexer API layer before any on-chain transaction.',
+    note:    'Live on Railway indexer right now',
   },
 ]
 
@@ -189,35 +201,47 @@ export default function AgentPage() {
           <div style={{ fontSize: '11px', fontWeight: 700, color: '#374151', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
             Agent modules
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {MODULES.map(({ id, name, status, color, what, how, note }) => (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {MODULES.map(({ id, name, status, accent, bg, icon, tagline, what, how, note }) => (
               <div key={id} style={{
-                background: '#0d0d0d', border: '1px solid #1a1a1a',
-                borderRadius: '12px', padding: '18px',
-                borderLeft: `3px solid ${color}`,
+                background: bg, border: `1px solid ${accent}25`,
+                borderRadius: '14px', padding: '20px',
+                display: 'flex', flexDirection: 'column', gap: '10px',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <span style={{
-                    fontFamily: 'monospace', fontSize: '11px', fontWeight: 700,
-                    color: '#374151', minWidth: '24px',
-                  }}>{id}</span>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9' }}>{name}</span>
-                  <span style={{
-                    marginLeft: 'auto', padding: '2px 10px', borderRadius: '4px',
-                    fontSize: '10px', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.04em',
-                    background: status === 'live' ? 'rgba(16,185,129,0.12)' : 'rgba(99,102,241,0.1)',
-                    color:      status === 'live' ? '#34d399' : '#818cf8',
-                    border:     `1px solid ${status === 'live' ? 'rgba(16,185,129,0.25)' : 'rgba(99,102,241,0.2)'}`,
-                  }}>
-                    {status === 'live' ? 'LIVE' : 'BUILT'}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                      background: `${accent}18`, border: `1px solid ${accent}30`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px',
+                    }}>
+                      {icon}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#f1f5f9' }}>{name}</div>
+                      <div style={{ fontSize: '11px', color: accent, fontWeight: 600, marginTop: '1px' }}>{tagline}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                    <span style={{ fontFamily: 'monospace', fontSize: '10px', fontWeight: 800, color: '#374151' }}>{id}</span>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: '4px',
+                      fontSize: '9px', fontWeight: 800, fontFamily: 'monospace', letterSpacing: '0.06em',
+                      background: status === 'live' ? 'rgba(16,185,129,0.15)' : `${accent}15`,
+                      color:      status === 'live' ? '#34d399' : accent,
+                      border:     `1px solid ${status === 'live' ? 'rgba(16,185,129,0.3)' : accent + '30'}`,
+                    }}>
+                      {status === 'live' ? '● LIVE' : 'BUILT'}
+                    </span>
+                  </div>
                 </div>
-                <p style={{ margin: '0 0 6px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.5 }}>{what}</p>
-                <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#475569', lineHeight: 1.5 }}>{how}</p>
+                <div style={{ height: '1px', background: `${accent}15` }} />
+                <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8', lineHeight: 1.6 }}>{what}</p>
+                <p style={{ margin: 0, fontSize: '11px', color: '#475569', lineHeight: 1.55 }}>{how}</p>
                 <div style={{
-                  display: 'inline-block', padding: '3px 10px', borderRadius: '4px',
-                  background: '#111', border: '1px solid #1e1e1e',
-                  fontSize: '11px', color: '#374151', fontFamily: 'monospace',
+                  padding: '4px 10px', borderRadius: '4px', alignSelf: 'flex-start',
+                  background: '#0a0a0a', border: `1px solid ${accent}15`,
+                  fontSize: '10px', color: '#374151', fontFamily: 'monospace',
                 }}>
                   {note}
                 </div>

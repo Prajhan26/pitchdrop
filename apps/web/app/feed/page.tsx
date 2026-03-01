@@ -52,6 +52,22 @@ export default function FeedPage() {
 
       {showModal && <SubmitIdeaModal onClose={() => setShowModal(false)} />}
 
+      {/* Connect wallet banner */}
+      {!isAuthenticated && (
+        <div style={{
+          background: 'rgba(99,102,241,0.08)', borderBottom: '1px solid rgba(99,102,241,0.2)',
+          padding: '10px 24px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
+          flexWrap: 'wrap',
+        }}>
+          <span style={{ fontSize: '13px', color: '#94a3b8' }}>
+            Sign in to vote and earn token airdrops on winning ideas
+          </span>
+          <AuthButton />
+          <span style={{ fontSize: '11px', color: '#374151' }}>powered by Privy · email or Google</span>
+        </div>
+      )}
+
       {/* Main */}
       <main style={mainStyle}>
         <div style={headerStyle}>

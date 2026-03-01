@@ -14,6 +14,8 @@ export type ApiIdea = {
   yesWeight: number
   noWeight: number
   pmfScore: number | null
+  bullCase: string | null
+  bearCase: string | null
   curveAddr: string | null
   tokenAddr: string | null
   createdAt: string

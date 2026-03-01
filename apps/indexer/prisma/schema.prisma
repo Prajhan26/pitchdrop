@@ -23,6 +23,8 @@ model Idea {
   yesWeight   Float    @default(0)
   noWeight    Float    @default(0)
   pmfScore    Int?
+  bullCase    String?
+  bearCase    String?
   curveAddr   String?
   tokenAddr   String?
   createdAt   DateTime @default(now())
