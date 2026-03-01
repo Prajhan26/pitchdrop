@@ -22,15 +22,21 @@ export async function ideasRoutes(app: FastifyInstance) {
     const { status, page, limit } = parsed.data
     const where = status !== 'all' ? { status } : {}
 
-    const [ideas, total] = await Promise.all([
+    const [rawIdeas, total] = await Promise.all([
       db.idea.findMany({
         where,
         orderBy: { publishedAt: 'desc' },
         take: limit,
         skip: (page - 1) * limit,
+        include: { _count: { select: { votes: true } } },
       }),
       db.idea.count({ where }),
     ])
+
+    const ideas = rawIdeas.map(({ _count, ...idea }) => ({
+      ...idea,
+      voteCount: _count.votes,
+    }))
 
     return { ideas, total, page, limit }
   })

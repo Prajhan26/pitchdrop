@@ -370,8 +370,9 @@ export default function TokenMarketPage() {
             }} />
           </div>
           <p style={{ margin: 0, fontSize: '12px', color: '#374151', lineHeight: 1.5 }}>
+            <span style={{ color: '#10b981', fontWeight: 600 }}>Bonding curve active — price rising with every buy.</span>{' '}
             {totalRaised ? `${fmt(totalRaised, 4)} ETH` : '0 ETH'} raised of 20 ETH target.
-            On graduation: token moves to Aerodrome DEX, early voters receive vested airdrops.
+            At graduation, token migrates to Aerodrome DEX and early voters receive vested airdrops.
           </p>
         </div>
 

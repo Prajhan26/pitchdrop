@@ -18,6 +18,7 @@ export type ApiIdea = {
   tokenAddr: string | null
   createdAt: string
   updatedAt: string
+  voteCount?: number
   votes?: ApiVote[]
 }
 

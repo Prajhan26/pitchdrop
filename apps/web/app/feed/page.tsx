@@ -82,14 +82,25 @@ export default function FeedPage() {
           {data?.ideas.map((idea) => (
             <div key={idea.id}>
               <IdeaCard idea={idea} />
-              {idea.curveAddr && (
+              {idea.status === 'won' && (
                 <div style={{ marginTop: '8px', textAlign: 'right' }}>
-                  <Link
-                    href={`/token/${idea.onchainId}?curve=${idea.curveAddr}`}
-                    style={tradeLinkStyle}
-                  >
-                    Trade CONV
-                  </Link>
+                  {idea.curveAddr ? (
+                    <Link
+                      href={`/token/${idea.onchainId}?curve=${idea.curveAddr}`}
+                      style={tradeLinkStyle}
+                    >
+                      Trade CONV →
+                    </Link>
+                  ) : (
+                    <span style={{
+                      fontSize: '12px', color: '#374151',
+                      padding: '4px 12px', borderRadius: '6px',
+                      border: '1px solid #1e1e1e', background: '#111',
+                      fontFamily: 'monospace',
+                    }}>
+                      Token curve deploying…
+                    </span>
+                  )}
                 </div>
               )}
             </div>

@@ -77,13 +77,21 @@ export function IdeaCard({ idea }: IdeaCardProps) {
       {/* Description */}
       <p style={descStyle}>{truncate(idea.description, 160)}</p>
 
-      {/* Founder */}
-      {!idea.isAnonymous && idea.founderAddr && (
+      {/* Founder + vote count */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <p style={founderStyle}>
-          by {idea.founderAddr.slice(0, 6)}…{idea.founderAddr.slice(-4)}
+          {idea.isAnonymous
+            ? 'by anonymous'
+            : idea.founderAddr
+              ? `by ${idea.founderAddr.slice(0, 6)}…${idea.founderAddr.slice(-4)}`
+              : null}
         </p>
-      )}
-      {idea.isAnonymous && <p style={founderStyle}>by anonymous</p>}
+        {(idea.voteCount ?? 0) > 0 && (
+          <span style={{ fontSize: '11px', color: '#374151', fontFamily: 'monospace' }}>
+            {idea.voteCount} voter{idea.voteCount !== 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
 
       {/* PMF score badge for resolved ideas */}
       {idea.pmfScore != null && (
@@ -94,6 +102,7 @@ export function IdeaCard({ idea }: IdeaCardProps) {
           border: `1px solid ${idea.pmfScore >= 70 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
         }}>
           <span style={{ fontSize: '11px', color: '#475569', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.04em' }}>EIGEN PMF</span>
+          <span style={{ fontSize: '10px', color: '#374151' }}>score</span>
           <span style={{
             fontSize: '14px', fontWeight: 800,
             color: idea.pmfScore >= 70 ? '#10b981' : '#ef4444',
