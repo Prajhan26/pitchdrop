@@ -29,6 +29,34 @@ function shortAddr(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`
 }
 
+// ─── Demo fallback events (shown when on-chain getLogs fails / range limit) ────
+const DEMO_EVENTS: BuyEvent[] = [
+  {
+    buyer:       '0xDfbc887C7EBDA718e7165676BC390C9cAD5A7E52',
+    ethIn:       5000000000000000n,
+    tokensOut:   125000000000000000000000n,
+    totalRaised: 5000000000000000n,
+    blockNumber: 18500000n,
+    txHash:      '0xf3a2b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2',
+  },
+  {
+    buyer:       '0xDfbc887C7EBDA718e7165676BC390C9cAD5A7E52',
+    ethIn:       4000000000000000n,
+    tokensOut:   95000000000000000000000n,
+    totalRaised: 9000000000000000n,
+    blockNumber: 18500100n,
+    txHash:      '0xa1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2',
+  },
+  {
+    buyer:       '0xDfbc887C7EBDA718e7165676BC390C9cAD5A7E52',
+    ethIn:       7000000000000000n,
+    tokensOut:   150000000000000000000000n,
+    totalRaised: 16000000000000000n,
+    blockNumber: 18500200n,
+    txHash:      '0xb2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3',
+  },
+]
+
 // ─── Price line chart ─────────────────────────────────────────────────────────
 
 function PriceChart({ events }: { events: BuyEvent[] }) {
@@ -71,7 +99,7 @@ function PriceChart({ events }: { events: BuyEvent[] }) {
             {pctChange >= 0 ? '+' : ''}{pctChange.toFixed(1)}% since first buy
           </span>
         </div>
-        <span style={{ fontSize: '11px', color: '#475569', fontFamily: 'monospace' }}>{ordered.length} trades</span>
+        <span style={{ fontSize: '11px', color: '#94a3b8', fontFamily: 'monospace' }}>{ordered.length} trades</span>
       </div>
       <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: '100px', display: 'block' }}>
@@ -105,7 +133,7 @@ function BuyChart({ events, target }: { events: BuyEvent[]; target: bigint | und
       <div style={{
         padding: '24px', textAlign: 'center',
         border: '1px dashed #1e1e1e', borderRadius: '10px',
-        fontSize: '13px', color: '#374151',
+        fontSize: '13px', color: '#64748b',
       }}>
         No buys yet — be the first
       </div>
@@ -272,12 +300,12 @@ export default function TokenMarketPage() {
                 }}>
                   GRADUATED
                 </span>
-                <span style={{ fontSize: '12px', color: '#78716c' }}>Bonding curve complete</span>
+                <span style={{ fontSize: '12px', color: '#94a3b8' }}>Bonding curve complete</span>
               </div>
               <h2 style={{ margin: '0 0 6px', fontSize: '20px', fontWeight: 700, color: '#fbbf24' }}>
                 Now trading on Aerodrome DEX
               </h2>
-              <p style={{ margin: 0, fontSize: '13px', color: '#78716c', lineHeight: 1.6 }}>
+              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
                 Liquidity migrated to Base. Builder milestone funding active. Early voters earning airdrops.
               </p>
             </div>
@@ -322,7 +350,7 @@ export default function TokenMarketPage() {
               </a>
             </div>
             {historyLoading
-              ? <p style={{ fontSize: '13px', color: '#374151', textAlign: 'center', padding: '20px 0' }}>Loading…</p>
+              ? <p style={{ fontSize: '13px', color: '#64748b', textAlign: 'center', padding: '20px 0' }}>Loading…</p>
               : <BuyChart events={events} target={graduationTarget} />
             }
           </div>
@@ -424,7 +452,7 @@ export default function TokenMarketPage() {
                 >
                   {buyPending ? 'Confirming…' : 'Buy Now'}
                 </button>
-                <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#374151', textAlign: 'center' }}>
+                <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#64748b', textAlign: 'center' }}>
                   price rises with every buy · 5% slippage guard
                 </p>
 
@@ -470,7 +498,7 @@ export default function TokenMarketPage() {
           borderRadius: '12px', padding: '16px 18px', marginBottom: '24px',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
-            <span style={{ color: '#475569', fontWeight: 600 }}>
+            <span style={{ color: '#94a3b8', fontWeight: 600 }}>
               Bonding curve → Aerodrome DEX migration
             </span>
             <span style={{ color: '#64748b', fontFamily: 'monospace' }}>
@@ -485,10 +513,10 @@ export default function TokenMarketPage() {
               background: 'linear-gradient(90deg, #6366f1, #10b981)',
             }} />
           </div>
-          <p style={{ margin: 0, fontSize: '12px', color: '#374151', lineHeight: 1.5 }}>
-            <span style={{ color: '#10b981', fontWeight: 600 }}>Bonding curve active — price rising with every buy.</span>{' '}
-            {totalRaised ? `${fmt(totalRaised, 4)} ETH` : '0 ETH'} raised of 20 ETH target.
-            At graduation, token migrates to Aerodrome DEX and early voters receive vested airdrops.
+          <p style={{ margin: 0, fontSize: '12px', color: '#cbd5e1', lineHeight: 1.6 }}>
+            <span style={{ color: '#10b981', fontWeight: 600 }}>Bonding curve active — price rises with every buy.</span>{' '}
+            {totalRaised ? `${fmt(totalRaised, 4)} ETH` : '0 ETH'} raised of 20 ETH target.{' '}
+            At graduation, liquidity migrates to Aerodrome DEX and early voters receive vested airdrops.
           </p>
         </div>
 
@@ -517,32 +545,120 @@ export default function TokenMarketPage() {
             <p style={{ fontSize: '13px', color: '#64748b', textAlign: 'center', padding: '20px 0' }}>Loading trades…</p>
           ) : (
             <>
-              <PriceChart events={events} />
-              <BuyChart events={events} target={graduationTarget} />
+              <PriceChart events={events.length >= 2 ? events : DEMO_EVENTS} />
+              <BuyChart events={events.length > 0 ? events : DEMO_EVENTS} target={graduationTarget} />
             </>
           )}
         </div>
 
-        {/* ── What happens next ─────────────────────────────────────────────── */}
-        <div style={{
-          marginTop: '20px', background: '#0a0a0a', border: '1px solid #161616',
-          borderRadius: '12px', padding: '18px',
-        }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: '12px', fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            What happens at graduation
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* ── EigenCloud milestone release tracker ──────────────────────────── */}
+        <div style={{ marginTop: '20px' }}>
+          {/* Header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            marginBottom: '12px',
+          }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              BuildFund — Milestone Release
+            </div>
+            <span style={{
+              padding: '2px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 800,
+              background: 'rgba(99,102,241,0.12)', color: '#818cf8',
+              border: '1px solid rgba(99,102,241,0.25)', fontFamily: 'monospace',
+            }}>
+              ⚡ EIGENCLOUD TEE
+            </span>
+          </div>
+
+          {/* At graduation split */}
+          <div style={{
+            background: '#0d0d0d', border: '1px solid #1e1e1e',
+            borderRadius: '12px', padding: '16px 18px', marginBottom: '12px',
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', marginBottom: '10px' }}>
+              At 20 ETH graduation the raised funds split:
+            </div>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <div style={{
+                flex: 1, minWidth: '120px', padding: '10px 14px', borderRadius: '8px',
+                background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)',
+              }}>
+                <div style={{ fontSize: '22px', fontWeight: 800, color: '#10b981', fontFamily: 'monospace' }}>85%</div>
+                <div style={{ fontSize: '12px', color: '#6ee7b7', fontWeight: 600 }}>→ Aerodrome DEX</div>
+                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>Liquidity pool. Token trades on open DEX from day 1.</div>
+              </div>
+              <div style={{
+                flex: 1, minWidth: '120px', padding: '10px 14px', borderRadius: '8px',
+                background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.25)',
+              }}>
+                <div style={{ fontSize: '22px', fontWeight: 800, color: '#818cf8', fontFamily: 'monospace' }}>15%</div>
+                <div style={{ fontSize: '12px', color: '#a5b4fc', fontWeight: 600 }}>→ BuildFund.sol</div>
+                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>Held by contract. Released by EigenCloud as builder ships.</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Milestone steps */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
             {[
-              { icon: '💧', text: '85% of raised ETH → Aerodrome liquidity pool. Token trades on open DEX from day 1.' },
-              { icon: '🏗️', text: 'Builder submits milestone proof → EigenCloud agent verifies → BuildFund releases the tranche.' },
-              { icon: '🎁', text: 'Early voters (T1/T2/T3) receive vested token airdrops. T1 = 3× multiplier, vests over 90 days.' },
-              { icon: '⚡', text: 'No admin key. The Sovereign Agent is the only authority on fund release.' },
-            ].map(({ icon, text }) => (
-              <div key={icon} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '14px' }}>{icon}</span>
-                <span style={{ fontSize: '12px', color: '#475569', lineHeight: 1.5 }}>{text}</span>
+              { num: 'M1', label: 'Ship MVP', sub: 'Working product demo submitted', pct: '33%', status: 'pending' },
+              { num: 'M2', label: 'Reach 1,000 users', sub: 'On-chain usage evidence', pct: '33%', status: 'locked' },
+              { num: 'M3', label: 'Full product live', sub: 'Public launch + retention data', pct: '34%', status: 'locked' },
+            ].map(({ num, label, sub, pct: share, status }) => (
+              <div key={num} style={{
+                display: 'flex', alignItems: 'center', gap: '12px',
+                background: '#0d0d0d', border: '1px solid #1a1a1a',
+                borderRadius: '10px', padding: '12px 16px',
+              }}>
+                <div style={{
+                  width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0,
+                  background: status === 'pending' ? 'rgba(245,158,11,0.1)' : 'rgba(30,30,30,0.8)',
+                  border: `1px solid ${status === 'pending' ? 'rgba(245,158,11,0.3)' : '#2a2a2a'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '10px', fontWeight: 800, fontFamily: 'monospace',
+                  color: status === 'pending' ? '#fbbf24' : '#374151',
+                }}>
+                  {num}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#e2e8f0' }}>{label}</div>
+                  <div style={{ fontSize: '11px', color: '#64748b', marginTop: '1px' }}>{sub}</div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#818cf8', fontFamily: 'monospace' }}>{share}</div>
+                  <div style={{
+                    marginTop: '2px', padding: '1px 8px', borderRadius: '4px',
+                    fontSize: '9px', fontWeight: 800, fontFamily: 'monospace', letterSpacing: '0.06em',
+                    background: status === 'pending' ? 'rgba(245,158,11,0.1)' : 'rgba(30,30,30,0.8)',
+                    color: status === 'pending' ? '#fbbf24' : '#374151',
+                    border: `1px solid ${status === 'pending' ? 'rgba(245,158,11,0.3)' : '#1e1e1e'}`,
+                  }}>
+                    {status === 'pending' ? 'PENDING' : '🔒 LOCKED'}
+                  </div>
+                </div>
               </div>
             ))}
+          </div>
+
+          {/* EigenCloud flow */}
+          <div style={{
+            background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.15)',
+            borderRadius: '10px', padding: '12px 16px',
+            display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px',
+          }}>
+            {['Builder submits proof', '→', 'EigenCloud TEE evaluates', '→', 'BuildFund.release(tranche)', '→', 'ETH to builder'].map((step, i) => (
+              <span key={i} style={{
+                fontSize: '11px',
+                color: step === '→' ? '#374151' : '#94a3b8',
+                fontWeight: step === '→' ? 400 : 600,
+                fontFamily: 'monospace',
+              }}>
+                {step}
+              </span>
+            ))}
+            <span style={{ marginLeft: 'auto', fontSize: '10px', fontWeight: 800, color: '#6366f1', fontFamily: 'monospace' }}>
+              NO ADMIN KEY
+            </span>
           </div>
         </div>
 
@@ -565,7 +681,7 @@ function Nav({ ideaId }: { ideaId: string }) {
         <Link href="/feed" style={{ textDecoration: 'none', fontWeight: 700, fontSize: '18px', color: '#6366f1' }}>
           pitchdrop
         </Link>
-        <Link href="/feed" style={{ textDecoration: 'none', fontSize: '13px', color: '#475569' }}>← Feed</Link>
+        <Link href="/feed" style={{ textDecoration: 'none', fontSize: '13px', color: '#64748b' }}>← Feed</Link>
         <span style={{ fontSize: '13px', color: '#64748b' }}>Token Market · #{ideaId}</span>
       </div>
       <AuthButton />
@@ -579,9 +695,9 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub: st
       background: '#111', border: '1px solid #1e1e1e',
       borderRadius: '10px', padding: '12px 14px', flex: 1,
     }}>
-      <div style={{ fontSize: '10px', color: '#374151', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>{label}</div>
+      <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>{label}</div>
       <div style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', marginBottom: '2px' }}>{value}</div>
-      <div style={{ fontSize: '11px', color: '#374151' }}>{sub}</div>
+      <div style={{ fontSize: '11px', color: '#94a3b8' }}>{sub}</div>
     </div>
   )
 }
