@@ -12,9 +12,12 @@ import { AuthButton } from '../../components/AuthButton'
 // ─── Token ticker (derived from idea name initials) ────────────────────────────
 const TICKER = 'TGG'  // Token-Gated Group chats
 
-// ─── OHLC candle data — 30 candles showing upward trend ───────────────────────
+// ─── Mock ETH→USD rate (production: Chainlink / Pyth oracle) ──────────────────
+const ETH_USD = 3_200
+
+// ─── OHLC candle data — 30 bars showing upward bonding-curve price action ─────
 // Each entry: [open, high, low, close, volume]
-// Prices in nanoETH/token (×1e-9 ETH).  Vol in arbitrary units.
+// Prices in nanoETH/token (×1e-9 ETH). Vol = arbitrary liquidity units.
 const CANDLES: [number, number, number, number, number][] = [
   [30, 32, 29, 31, 12], [31, 32, 29, 30,  8], [30, 34, 30, 33, 15],
   [33, 34, 31, 32, 10], [32, 36, 32, 35, 18], [35, 38, 35, 37, 20],
@@ -28,50 +31,69 @@ const CANDLES: [number, number, number, number, number][] = [
   [63, 64, 61, 62, 35], [62, 66, 62, 65, 55], [65, 70, 65, 68, 60],
 ]
 
-// ─── Demo trades — simulating live buys ──────────────────────────────────────
+// ─── Live buy activity (newest-first) ─────────────────────────────────────────
 const DEMO_TRADES = [
-  { addr: '0xDfbc887C', tokens: '100K', eth: '0.005', ago: 'just now',   side: 'buy' },
-  { addr: '0x9F39c8C2', tokens:  '82K', eth: '0.004', ago: '2m ago',    side: 'buy' },
-  { addr: '0x3D4E5F6A', tokens: '147K', eth: '0.007', ago: '4m ago',    side: 'buy' },
-  { addr: '0x1A2B3C4D', tokens:  '64K', eth: '0.003', ago: '7m ago',    side: 'buy' },
-  { addr: '0x9F39c8C2', tokens: '220K', eth: '0.010', ago: '11m ago',   side: 'buy' },
-  { addr: '0xDfbc887C', tokens: '135K', eth: '0.006', ago: '14m ago',   side: 'buy' },
-  { addr: '0x3D4E5F6A', tokens:  '46K', eth: '0.002', ago: '18m ago',   side: 'buy' },
-  { addr: '0x1A2B3C4D', tokens:  '95K', eth: '0.004', ago: '23m ago',   side: 'buy' },
-  { addr: '0x9F39c8C2', tokens: '195K', eth: '0.008', ago: '28m ago',   side: 'buy' },
-  { addr: '0xDfbc887C', tokens:  '76K', eth: '0.003', ago: '33m ago',   side: 'buy' },
-  { addr: '0x3D4E5F6A', tokens: '130K', eth: '0.005', ago: '39m ago',   side: 'buy' },
-  { addr: '0x1A2B3C4D', tokens:  '55K', eth: '0.002', ago: '45m ago',   side: 'buy' },
+  { addr: '0xDfbc887C', tokens: '100K', usd: '$16.00', ago: 'just now', side: 'buy' },
+  { addr: '0x9F39c8C2', tokens:  '82K', usd: '$12.80', ago: '2m ago',   side: 'buy' },
+  { addr: '0x3D4E5F6A', tokens: '147K', usd: '$22.40', ago: '4m ago',   side: 'buy' },
+  { addr: '0x1A2B3C4D', tokens:  '64K', usd:  '$9.60', ago: '7m ago',   side: 'buy' },
+  { addr: '0x9F39c8C2', tokens: '220K', usd: '$32.00', ago: '11m ago',  side: 'buy' },
+  { addr: '0xDfbc887C', tokens: '135K', usd: '$19.20', ago: '14m ago',  side: 'buy' },
+  { addr: '0x3D4E5F6A', tokens:  '46K', usd:  '$6.40', ago: '18m ago',  side: 'buy' },
+  { addr: '0x1A2B3C4D', tokens:  '95K', usd: '$12.80', ago: '23m ago',  side: 'buy' },
+  { addr: '0x9F39c8C2', tokens: '195K', usd: '$25.60', ago: '28m ago',  side: 'buy' },
+  { addr: '0xDfbc887C', tokens:  '76K', usd:  '$9.60', ago: '33m ago',  side: 'buy' },
+  { addr: '0x3D4E5F6A', tokens: '130K', usd: '$16.00', ago: '39m ago',  side: 'buy' },
+  { addr: '0x1A2B3C4D', tokens:  '55K', usd:  '$6.40', ago: '45m ago',  side: 'buy' },
 ]
+
+// ─── Price formatting helpers ─────────────────────────────────────────────────
+
+/** nanoETH units → clean USD string  e.g. 68 → "$0.0002176" */
+function nanoToUSD(nano: number): string {
+  const usd = nano * 1e-9 * ETH_USD
+  const s = usd.toFixed(7)
+  // Strip trailing zeros but keep at least 4 significant figs after decimal
+  const trimmed = s.replace(/(\.\d+?)0+$/, '$1')
+  return `$${trimmed}`
+}
+
+/** Compact USD for stat pills  e.g. 274 → "$274", 1_800_000 → "$1.8M" */
+function compactUSD(usd: number): string {
+  if (usd >= 1_000_000) return `$${(usd / 1_000_000).toFixed(1)}M`
+  if (usd >= 1_000)     return `$${(usd / 1_000).toFixed(1)}K`
+  return `$${Math.round(usd)}`
+}
 
 // ─── Candlestick chart ────────────────────────────────────────────────────────
 function CandleChart() {
   const W = 700, CH = 210, VH = 55, GAP = 8, H = CH + GAP + VH
-  const padL = 8, padR = 52, padT = 14, padB = 4
+  const padL = 8, padR = 60, padT = 14, padB = 4
 
-  const usableW = W - padL - padR           // 640
-  const slotW   = usableW / CANDLES.length  // ~21.3px
-  const bodyW   = slotW * 0.58              // ~12.4px
+  const usableW = W - padL - padR         // 632
+  const slotW   = usableW / CANDLES.length
+  const bodyW   = slotW * 0.58
 
   const allPrices = CANDLES.flatMap(([o, h, l, c]) => [o, h, l, c])
-  const pMin = Math.min(...allPrices) - 2   // 27
-  const pMax = Math.max(...allPrices) + 2   // 72
-  const pRange = pMax - pMin                // 45
+  const pMin = Math.min(...allPrices) - 2
+  const pMax = Math.max(...allPrices) + 2
+  const pRange = pMax - pMin
 
-  const chartH = CH - padT - padB          // 192
+  const chartH = CH - padT - padB
   const pToY = (p: number) => padT + (1 - (p - pMin) / pRange) * chartH
 
   const vMax = Math.max(...CANDLES.map(c => c[4]))
   const vToH = (v: number) => (v / vMax) * VH * 0.9
 
-  // Y-axis price labels (4 levels)
-  const yLabels = [0.15, 0.38, 0.62, 0.85].map(f => ({
+  // 5 horizontal price levels for Y-axis
+  const yLabels = [0.1, 0.3, 0.5, 0.7, 0.9].map(f => ({
     y: padT + f * chartH,
     p: pMax - f * pRange,
   }))
 
-  // X-axis time labels (every 5 candles)
+  // X-axis time labels
   const timeLabels = ['45m', '35m', '25m', '15m', '5m', 'now']
+  const lastClose = CANDLES[CANDLES.length - 1]![3]
 
   return (
     <svg
@@ -85,14 +107,14 @@ function CandleChart() {
       {/* Horizontal grid lines */}
       {yLabels.map(({ y }, i) => (
         <line key={i} x1={padL} y1={y} x2={W - padR} y2={y}
-          stroke="#1a1a1a" strokeWidth="1" strokeDasharray="3 3" />
+          stroke="#161616" strokeWidth="1" />
       ))}
 
-      {/* Y-axis price labels */}
+      {/* Y-axis USD price labels */}
       {yLabels.map(({ y, p }, i) => (
-        <text key={i} x={W - padR + 6} y={y + 3}
-          fontSize="8.5" fill="#4b5563" fontFamily="monospace" textAnchor="start">
-          {(p * 1e-9).toFixed(8).slice(0, 10)}
+        <text key={i} x={W - padR + 5} y={y + 3.5}
+          fontSize="8.5" fill="#6b7280" fontFamily="monospace" textAnchor="start">
+          {nanoToUSD(p)}
         </text>
       ))}
 
@@ -101,10 +123,10 @@ function CandleChart() {
 
       {/* Candles */}
       {CANDLES.map(([o, h, l, c, v], i) => {
-        const isGreen  = c >= o
-        const color    = isGreen ? '#22c55e' : '#ef4444'
-        const xCenter  = padL + i * slotW + slotW / 2
-        const bodyX    = xCenter - bodyW / 2
+        const isGreen = c >= o
+        const color   = isGreen ? '#22c55e' : '#ef4444'
+        const xCenter = padL + i * slotW + slotW / 2
+        const bodyX   = xCenter - bodyW / 2
 
         const yO = pToY(o), yC = pToY(c)
         const yH = pToY(h), yL = pToY(l)
@@ -135,25 +157,28 @@ function CandleChart() {
         const x   = padL + idx * slotW + slotW / 2
         return (
           <text key={t} x={x} y={H - 1}
-            fontSize="8" fill="#374151" fontFamily="monospace" textAnchor="middle">
+            fontSize="8" fill="#4b5563" fontFamily="monospace" textAnchor="middle">
             {t}
           </text>
         )
       })}
 
-      {/* Current price line */}
+      {/* Current price dashed line + USD label box */}
       {(() => {
-        const lastClose = CANDLES[CANDLES.length - 1]![3]
-        const y = pToY(lastClose)
+        const y     = pToY(lastClose)
+        const label = nanoToUSD(lastClose)  // e.g. "$0.0002176"
         return (
           <g>
             <line x1={padL} y1={y} x2={W - padR} y2={y}
-              stroke="#22c55e" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.6" />
-            <rect x={W - padR} y={y - 6} width={padR - 2} height={12}
+              stroke="#22c55e" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.7" />
+            <rect x={W - padR} y={y - 7} width={padR - 2} height={14}
               fill="#22c55e" rx="2" />
-            <text x={W - padR + padR / 2 - 1} y={y + 3.5}
-              fontSize="8" fill="#000" fontFamily="monospace" textAnchor="middle" fontWeight="700">
-              {lastClose}nE
+            <text
+              x={W - padR + (padR - 2) / 2} y={y + 3.5}
+              fontSize="7.5" fill="#000" fontFamily="monospace"
+              textAnchor="middle" fontWeight="700"
+            >
+              {label}
             </text>
           </g>
         )
@@ -162,13 +187,12 @@ function CandleChart() {
   )
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
+// ─── Misc helpers ─────────────────────────────────────────────────────────────
 function fmt(raw: bigint, d = 4): string {
   const n = Number(formatEther(raw))
   if (n === 0) return '0'
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(2)}K`
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(2)}K`
   return n.toLocaleString(undefined, { maximumFractionDigits: d })
 }
 
@@ -189,22 +213,25 @@ export default function TokenMarketPage() {
   const curveAddress = curveParam ? (curveParam as `0x${string}`) : undefined
 
   const { totalRaised, graduated, graduationTarget } = useBondingCurve(curveAddress)
-  const [ethInput, setEthInput] = useState('')
+  const [ethInput, setEthInput]   = useState('')
   const { tokensOut, isLoading: quoteLoading } = useTokensForEth(curveAddress, ethInput)
   const { buy, isPending: buyPending, error: buyError } = useBuyTokens(curveAddress)
 
-  const [txHash, setTxHash]     = useState<string | undefined>()
-  const [txError, setTxError]   = useState<string | undefined>()
+  const [txHash, setTxHash]       = useState<string | undefined>()
+  const [txError, setTxError]     = useState<string | undefined>()
   const [timeframe, setTimeframe] = useState('5m')
 
   const progress = pct(totalRaised, graduationTarget)
 
-  // Current price from last candle
-  const lastCandle  = CANDLES[CANDLES.length - 1]!
-  const firstCandle = CANDLES[0]!
-  const curPriceN   = lastCandle[3]   // 68 nanoETH/token
-  const firstPriceN = firstCandle[0]  // 30 nanoETH/token
-  const priceChangePct = ((curPriceN - firstPriceN) / firstPriceN * 100).toFixed(1)
+  // ── Derived price values ───────────────────────────────────────────────────
+  const lastCandle    = CANDLES[CANDLES.length - 1]!
+  const firstCandle   = CANDLES[0]!
+  const curPriceNano  = lastCandle[3]   // 68 nanoETH/token
+  const firstPriceN   = firstCandle[0]  // 30 nanoETH/token
+  const priceChangeP  = ((curPriceNano - firstPriceN) / firstPriceN * 100).toFixed(1)
+  const curPriceUSD   = curPriceNano * 1e-9 * ETH_USD           // ~0.0002176
+  const mcapUSD       = compactUSD(curPriceUSD * 1_260_000)     // ~$274
+  const vol24hUSD     = compactUSD(0.059 * ETH_USD)             // ~$189
 
   async function handleBuy() {
     if (!ethInput) return
@@ -217,7 +244,7 @@ export default function TokenMarketPage() {
     }
   }
 
-  // ─── No curve ─────────────────────────────────────────────────────────────
+  // ── No curve address ───────────────────────────────────────────────────────
   if (!curveAddress) {
     return (
       <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#f1f5f9' }}>
@@ -231,7 +258,7 @@ export default function TokenMarketPage() {
     )
   }
 
-  // ─── Graduated ────────────────────────────────────────────────────────────
+  // ── Graduated ─────────────────────────────────────────────────────────────
   if (graduated) {
     return (
       <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#f1f5f9' }}>
@@ -247,7 +274,7 @@ export default function TokenMarketPage() {
     )
   }
 
-  // ─── Trading live ──────────────────────────────────────────────────────────
+  // ── Trading live ───────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#f1f5f9' }}>
       <Nav ideaId={ideaId} />
@@ -260,41 +287,50 @@ export default function TokenMarketPage() {
           padding: '14px 20px', borderBottom: '1px solid #141414',
           background: '#0d0d0d',
         }}>
-          {/* Ticker + name */}
+          {/* Logo + ticker */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
-              width: '36px', height: '36px', borderRadius: '50%',
+              width: '38px', height: '38px', borderRadius: '50%', flexShrink: 0,
               background: 'linear-gradient(135deg, #6366f1, #10b981)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '13px', fontWeight: 800, color: '#fff', flexShrink: 0,
+              fontSize: '14px', fontWeight: 800, color: '#fff',
             }}>
               {TICKER[0]}
             </div>
             <div>
-              <div style={{ fontSize: '15px', fontWeight: 800, color: '#f1f5f9' }}>${TICKER}</div>
-              <div style={{ fontSize: '10px', color: '#64748b' }}>Base Sepolia · Bonding Curve</div>
+              <div style={{ fontSize: '16px', fontWeight: 800, color: '#f1f5f9' }}>${TICKER}</div>
+              <div style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>Base · Bonding Curve</div>
             </div>
           </div>
 
-          {/* Price */}
+          {/* Price — USD prominent, ETH secondary */}
           <div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', fontFamily: 'monospace' }}>
-              {curPriceN}e-9 ETH
+            <div style={{ fontSize: '22px', fontWeight: 800, color: '#f1f5f9', fontFamily: 'monospace', lineHeight: 1 }}>
+              {nanoToUSD(curPriceNano)}
             </div>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: '#22c55e' }}>
-              ▲ {priceChangePct}% all time
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
+              <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
+                {(curPriceNano * 1e-9).toFixed(9)} ETH
+              </span>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#22c55e' }}>
+                ▲ {priceChangeP}%
+              </span>
             </div>
           </div>
 
           {/* Stats pills */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             {[
-              { label: '24h Vol', value: '0.059 ETH' },
-              { label: 'MCap', value: `${(curPriceN * 1e-9 * 1_260_000).toFixed(4)} ETH` },
-              { label: 'Buys', value: String(DEMO_TRADES.length) },
+              { label: '24h Vol', value: vol24hUSD },
+              { label: 'MCap',    value: mcapUSD },
+              { label: 'Liq',     value: `${Number(formatEther(totalRaised ?? 0n)).toFixed(3)} ETH` },
+              { label: 'Buys',    value: String(DEMO_TRADES.length) },
             ].map(({ label, value }) => (
-              <div key={label} style={{ textAlign: 'center', padding: '4px 12px', background: '#111', borderRadius: '6px', border: '1px solid #1e1e1e' }}>
-                <div style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+              <div key={label} style={{
+                textAlign: 'center', padding: '5px 12px',
+                background: '#111', borderRadius: '6px', border: '1px solid #1e1e1e',
+              }}>
+                <div style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>{label}</div>
                 <div style={{ fontSize: '12px', fontWeight: 700, color: '#f1f5f9', fontFamily: 'monospace' }}>{value}</div>
               </div>
             ))}
@@ -304,14 +340,14 @@ export default function TokenMarketPage() {
         {/* ── Candlestick chart ──────────────────────────────────────────── */}
         <div style={{ background: '#0a0a0a', borderBottom: '1px solid #141414' }}>
 
-          {/* Timeframe selector + LIVE badge */}
+          {/* Timeframe selector + LIVE dot */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', borderBottom: '1px solid #111' }}>
             {['1m', '5m', '15m', '1h'].map(tf => (
               <button key={tf} onClick={() => setTimeframe(tf)} style={{
                 padding: '3px 10px', borderRadius: '4px', border: 'none', cursor: 'pointer',
                 fontSize: '11px', fontWeight: 700, fontFamily: 'monospace',
                 background: timeframe === tf ? '#1e2d3d' : 'transparent',
-                color:      timeframe === tf ? '#60a5fa' : '#374151',
+                color:      timeframe === tf ? '#60a5fa' : '#64748b',
               }}>
                 {tf}
               </button>
@@ -322,12 +358,11 @@ export default function TokenMarketPage() {
             </div>
           </div>
 
-          {/* The chart */}
           <CandleChart />
         </div>
 
-        {/* ── Two-column: buy + recent trades ───────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0', padding: '0' }}>
+        {/* ── Buy panel + recent trades ──────────────────────────────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 
           {/* Buy panel */}
           <div style={{ padding: '18px', borderRight: '1px solid #141414', borderBottom: '1px solid #141414' }}>
@@ -352,10 +387,15 @@ export default function TokenMarketPage() {
                     color: '#f1f5f9', fontSize: '15px', outline: 'none',
                   }}
                 />
-                <div style={{ padding: '8px 12px', borderRadius: '8px', background: '#111', border: '1px solid #1a1a1a', marginBottom: '10px', fontSize: '13px', color: '#64748b' }}>
-                  {quoteLoading ? 'Calculating…'
+                <div style={{
+                  padding: '8px 12px', borderRadius: '8px',
+                  background: '#111', border: '1px solid #1a1a1a',
+                  marginBottom: '10px', fontSize: '13px', color: '#64748b',
+                }}>
+                  {quoteLoading
+                    ? 'Calculating…'
                     : tokensOut !== undefined
-                      ? <>→ <strong style={{ color: '#f1f5f9' }}>{fmt(tokensOut, 0)} ${TICKER}</strong></>
+                      ? <><span style={{ color: '#64748b' }}>→ </span><strong style={{ color: '#f1f5f9' }}>{fmt(tokensOut, 0)} ${TICKER}</strong></>
                       : `Enter ETH to see ${TICKER} amount`}
                 </div>
                 <button
@@ -363,14 +403,15 @@ export default function TokenMarketPage() {
                   disabled={buyPending || !ethInput || Number(ethInput) <= 0}
                   style={{
                     width: '100%', padding: '12px', borderRadius: '8px', border: 'none',
-                    fontSize: '14px', fontWeight: 800, cursor: buyPending || !ethInput || Number(ethInput) <= 0 ? 'not-allowed' : 'pointer',
+                    fontSize: '14px', fontWeight: 800,
+                    cursor: buyPending || !ethInput || Number(ethInput) <= 0 ? 'not-allowed' : 'pointer',
                     background: buyPending || !ethInput || Number(ethInput) <= 0 ? '#1e1e1e' : '#22c55e',
-                    color:      buyPending || !ethInput || Number(ethInput) <= 0 ? '#374151' : '#000',
+                    color:      buyPending || !ethInput || Number(ethInput) <= 0 ? '#64748b' : '#000',
                   }}
                 >
                   {buyPending ? 'Confirming…' : `↑ Buy ${TICKER}`}
                 </button>
-                <p style={{ margin: '6px 0 0', fontSize: '10px', color: '#374151', textAlign: 'center' }}>
+                <p style={{ margin: '6px 0 0', fontSize: '10px', color: '#64748b', textAlign: 'center' }}>
                   price rises with every buy · 5% slippage
                 </p>
                 {txHash && (
@@ -411,25 +452,29 @@ export default function TokenMarketPage() {
               Recent trades
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {/* Header */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '4px', fontSize: '9px', color: '#374151', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px', paddingBottom: '4px', borderBottom: '1px solid #111' }}>
+              {/* Column headers */}
+              <div style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '4px',
+                fontSize: '9px', color: '#64748b', fontFamily: 'monospace',
+                textTransform: 'uppercase', letterSpacing: '0.06em',
+                marginBottom: '4px', paddingBottom: '4px', borderBottom: '1px solid #111',
+              }}>
                 <span>Wallet</span>
                 <span style={{ textAlign: 'right' }}>Amount</span>
-                <span style={{ textAlign: 'right' }}>ETH</span>
+                <span style={{ textAlign: 'right' }}>USD</span>
                 <span style={{ textAlign: 'right' }}>Time</span>
               </div>
               {DEMO_TRADES.map((t, i) => (
                 <div key={i} style={{
                   display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '4px',
-                  fontSize: '11px', fontFamily: 'monospace',
-                  padding: '3px 0',
+                  fontSize: '11px', fontFamily: 'monospace', padding: '3px 0',
                   background: i === 0 ? 'rgba(34,197,94,0.04)' : 'transparent',
                   borderRadius: '4px',
                 }}>
                   <span style={{ color: '#64748b' }}>{t.addr}</span>
                   <span style={{ color: '#22c55e', textAlign: 'right', fontWeight: 700 }}>+{t.tokens}</span>
-                  <span style={{ color: '#94a3b8', textAlign: 'right' }}>{t.eth}</span>
-                  <span style={{ color: '#374151', textAlign: 'right' }}>{t.ago}</span>
+                  <span style={{ color: '#94a3b8', textAlign: 'right' }}>{t.usd}</span>
+                  <span style={{ color: '#64748b', textAlign: 'right' }}>{t.ago}</span>
                 </div>
               ))}
             </div>
@@ -467,7 +512,14 @@ export default function TokenMarketPage() {
               { num: 'M3', label: 'Full product live', sub: 'Public launch + retention', share: '34%', status: 'locked' },
             ].map(({ num, label, sub, share, status }) => (
               <div key={num} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: '8px', padding: '10px 14px' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, background: status === 'pending' ? 'rgba(245,158,11,0.1)' : '#0a0a0a', border: `1px solid ${status === 'pending' ? 'rgba(245,158,11,0.4)' : '#222'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 800, fontFamily: 'monospace', color: status === 'pending' ? '#fbbf24' : '#374151' }}>
+                <div style={{
+                  width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
+                  background: status === 'pending' ? 'rgba(245,158,11,0.1)' : '#0a0a0a',
+                  border: `1px solid ${status === 'pending' ? 'rgba(245,158,11,0.4)' : '#222'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '9px', fontWeight: 800, fontFamily: 'monospace',
+                  color: status === 'pending' ? '#fbbf24' : '#374151',
+                }}>
                   {num}
                 </div>
                 <div style={{ flex: 1 }}>
@@ -505,7 +557,7 @@ function Nav({ ideaId }: { ideaId: string }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <Link href="/feed" style={{ textDecoration: 'none', fontWeight: 700, fontSize: '16px', color: '#6366f1' }}>pitchdrop</Link>
         <Link href="/feed" style={{ textDecoration: 'none', fontSize: '12px', color: '#64748b' }}>← Feed</Link>
-        <span style={{ fontSize: '12px', color: '#374151' }}>#{ideaId}</span>
+        <span style={{ fontSize: '12px', color: '#64748b' }}>#{ideaId}</span>
       </div>
       <AuthButton />
     </nav>
